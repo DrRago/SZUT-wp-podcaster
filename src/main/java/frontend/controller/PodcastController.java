@@ -1,6 +1,6 @@
 package frontend.controller;
 
-public class CreatePodcastController {
+public class PodcastController {
 
     public void init(){
 

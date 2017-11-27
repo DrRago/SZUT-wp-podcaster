@@ -54,6 +54,10 @@ public class MainController {
         stage.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
     }
 
+    @FXML
+    void menuNew(ActionEvent event){
+        btnAddNew(event);
+    }
 
     @FXML
     void MenuSettings(ActionEvent event) {
@@ -102,7 +106,7 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        CreatePodcastController controller = fxmlLoader.getController();
+        PodcastController controller = fxmlLoader.getController();
         controller.init();
         stage.setTitle("New Podcast");
         stage.setScene(new Scene(root));
@@ -154,7 +158,6 @@ public class MainController {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
         AnchorPane box = fxmlLoader.load();
         controller = fxmlLoader.getController();
-        controller.setController(this);
         // Create new Anchor Pane for the SidePane
         pane = new AnchorPane(box);
         // Hide the new Anchor Pane for the SidePane
@@ -172,5 +175,4 @@ public class MainController {
         pane.setVisible(false);
         statusbar.setProgress(1);
     }
-
 }

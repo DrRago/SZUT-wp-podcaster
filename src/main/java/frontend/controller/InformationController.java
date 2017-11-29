@@ -27,10 +27,7 @@ public class InformationController {
     @FXML
     public ListView titleListView;
 
-    @FXML
-    void closeInformation(ActionEvent event) {
-        controller.closePane();
-    }
+
 
     public void initialize() {
 
@@ -42,5 +39,8 @@ public class InformationController {
         else titleListView.setVisible(true);
     }
 
-
+    @FXML
+    void closeInformation(ActionEvent event) {
+        controller.closePane();
+    }
 }

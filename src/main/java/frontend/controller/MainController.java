@@ -38,7 +38,9 @@ public class MainController {
 
     private InformationController controller = null;
 
-    private Stage stage = new Stage();
+    private Stage stagePodcast = new Stage();
+    private Stage stageSettings = new Stage();
+    private Stage stageHelp = new Stage();
 
     private ObservableList tableData = FXCollections.observableArrayList();
 
@@ -51,7 +53,9 @@ public class MainController {
         }
         statusTypeLabel.setVisible(false);
         statusbar.setVisible(false);
-        stage.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
+        stagePodcast.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
+        stageHelp.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
+        stageSettings.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
     }
 
     @FXML
@@ -86,10 +90,10 @@ public class MainController {
             e.printStackTrace();
         }
         //HelpController controller = fxmlLoader.getController();
-        stage.setTitle("New Podcast");
-        stage.setScene(new Scene(root));
+        stageHelp.setTitle("Help");
+        stageHelp.setScene(new Scene(root));
 
-        stage.show();
+        stageHelp.show();
     }
 
     @FXML
@@ -107,11 +111,13 @@ public class MainController {
             e.printStackTrace();
         }
         PodcastController controller = fxmlLoader.getController();
+        //TODO: WARUM WIRD DAS ROT MAKIERT???? XD
+        controller.setController(this);
         controller.init();
-        stage.setTitle("New Podcast");
-        stage.setScene(new Scene(root));
+        stagePodcast.setTitle("New Podcast");
+        stagePodcast.setScene(new Scene(root));
 
-        stage.show();
+        stagePodcast.show();
 
     }
 
@@ -149,15 +155,16 @@ public class MainController {
         }
         SettingController controller = fxmlLoader.getController();
         controller.init();
-        stage.setTitle("WP-Podcaster - Settings");
-        stage.setScene(new Scene(root));
-        stage.show();
+        stageSettings.setTitle("WP-Podcaster - Settings");
+        stageSettings.setScene(new Scene(root));
+        stageSettings.show();
     }
 
     void loadPane() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
         AnchorPane box = fxmlLoader.load();
         controller = fxmlLoader.getController();
+        controller.setController(this);
         // Create new Anchor Pane for the SidePane
         pane = new AnchorPane(box);
         // Hide the new Anchor Pane for the SidePane
@@ -174,5 +181,10 @@ public class MainController {
         EditPane.getChildren().remove(pane);
         pane.setVisible(false);
         statusbar.setProgress(1);
+    }
+
+    public void closePodcast() {
+        System.out.print("hey");
+        stagePodcast.close();
     }
 }

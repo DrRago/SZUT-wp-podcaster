@@ -1,0 +1,25 @@
+This WordPress Podcaster is designed to have a easier way publishing new Podcast to your Website.
+
+
+How it works:
+
+
+If your starting the program the first time you have to link your WordPress-Website and login to it.
+
+If you have already done this:
+- Create a new Podcast
+- Choose your File, which you're going to upload
+- Give it a title
+- Click Save and Publish it to your Website
+
+Editing:
+You can edit a Podcast by choosing your Podcast in the Table
+- Choose your Podcast
+- Click Edit
+- After your changes click Save
+
+Removing:
+If you don't want to have a Podcast on your Website anymore just delete it
+- Choose the Podcast
+- Click Remove
+- Verify it by clicking on Ok

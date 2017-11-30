@@ -4,7 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import util.PathUtil;
 
 public class Run extends Application{
 
@@ -12,16 +14,14 @@ public class Run extends Application{
 	@Override
 	public void start(Stage primaryStage){
 		try {
-			//New FXMLLoader
-			final FXMLLoader loader = new FXMLLoader();
-
-			//Load the fxml data
-			Parent root = loader.load(getClass().getClassLoader().getResource("MainGui.fxml"));
+			Parent root = FXMLLoader.load(PathUtil.getResourcePath("Controller/MainGui.fxml"));
 
 			//Set the GUI title
-			primaryStage.setTitle("WP-Podcaster");
+			primaryStage.setTitle("- Podcaster");
 			//Set a new Scene
 			primaryStage.setScene(new Scene(root));
+
+			primaryStage.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
 
 			//Start the GUI
 			primaryStage.show();

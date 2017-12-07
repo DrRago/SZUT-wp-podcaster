@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -32,13 +33,16 @@ public class MainController {
     private Label statusTypeLabel;
 
     @FXML
+    private HBox mainHbox;
+
+    @FXML
     private ProgressBar statusbar;
 
     private Pane pane;
 
     private InformationController controller = null;
 
-    private Stage stagePodcast = new Stage();
+    public Stage stagePodcast = new Stage();
     private Stage stageSettings = new Stage();
     private Stage stageHelp = new Stage();
 
@@ -124,10 +128,10 @@ public class MainController {
 
     @FXML
     void btnEdit(ActionEvent event) {
-        if(tableView.getSelectionModel().getSelectedItems() != null && !pane.isVisible()) {
-                openPane();
+        //if(tableView.getSelectionModel().getSelectedItems() != null && !pane.isVisible()) {
+        if(!pane.isVisible())openPane();
                 //TODO: Listing
-        }
+        //}
     }
 
     @FXML
@@ -180,11 +184,10 @@ public class MainController {
     void closePane() {
         EditPane.getChildren().remove(pane);
         pane.setVisible(false);
-        statusbar.setProgress(1);
     }
 
     public void closePodcast() {
-        System.out.print("hey");
         stagePodcast.close();
     }
 }
+

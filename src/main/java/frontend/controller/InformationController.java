@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import lombok.Getter;
@@ -27,6 +28,8 @@ public class InformationController {
     @FXML
     public ListView titleListView;
 
+    @FXML
+    public AnchorPane informationPane;
 
 
     public void initialize() {

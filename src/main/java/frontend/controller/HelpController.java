@@ -25,6 +25,7 @@ public class HelpController {
     private WebView web;
 
     public void initialize() throws IOException {
+
         title.setStyle("-fx-font: 30px bold");
         title.setTextFill(Color.web("#00769D"));
         title.setText("About WordPress - Podcaster");

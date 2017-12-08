@@ -5,14 +5,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import util.PathUtil;
 
@@ -33,16 +31,16 @@ public class MainController {
     private Label statusTypeLabel;
 
     @FXML
-    private HBox mainHbox;
+    public HBox mainHbox;
 
     @FXML
     private ProgressBar statusbar;
 
-    private Pane pane;
+    private Region pane;
 
     private InformationController controller = null;
 
-    public Stage stagePodcast = new Stage();
+    public static Stage stagePodcast = new Stage();
     private Stage stageSettings = new Stage();
     private Stage stageHelp = new Stage();
 
@@ -122,7 +120,8 @@ public class MainController {
         stagePodcast.setScene(new Scene(root));
 
         stagePodcast.show();
-
+        stagePodcast.setMinHeight(425);
+        stagePodcast.setMinWidth(600);
     }
 
 
@@ -150,7 +149,7 @@ public class MainController {
     }
 
     void openSetting() {
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Settings.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Option.fxml"));
         Parent root = null;
         try {
             root = fxmlLoader.load();
@@ -165,24 +164,34 @@ public class MainController {
     }
 
     void loadPane() throws IOException {
+
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
-        AnchorPane box = fxmlLoader.load();
+        pane = fxmlLoader.load();
         controller = fxmlLoader.getController();
         controller.setController(this);
         // Create new Anchor Pane for the SidePane
-        pane = new AnchorPane(box);
+
+        //EditPane.setMaxWidth(pane.getMaxWidth());
+
         // Hide the new Anchor Pane for the SidePane
+        //pane.setMinHeight(VBoxEdt.getMaxHeight());
+
         pane.setVisible(false);
     }
 
     void openPane() {
-        EditPane.getChildren().add(pane);
+        VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
+        VBoxEdt.setMaxHeight(mainHbox.getMaxHeight()); //??????????????
+        VBoxEdt.setMargin(mainHbox, new Insets(5,5,0,0));
+        VBoxEdt.getChildren().add(pane);
         pane.setVisible(true);
         statusbar.setProgress(0.5);
     }
 
     void closePane() {
-        EditPane.getChildren().remove(pane);
+        VBoxEdt.setMargin(mainHbox, new Insets(0,0,0,0));
+        VBoxEdt.setMaxWidth(0);
+        VBoxEdt.getChildren().remove(pane);
         pane.setVisible(false);
     }
 

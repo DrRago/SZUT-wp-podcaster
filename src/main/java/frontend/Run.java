@@ -26,6 +26,8 @@ public class Run extends Application{
 			//Start the GUI
 			primaryStage.show();
 
+			primaryStage.setMinWidth(400);
+			primaryStage.setMinHeight(300);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

@@ -11,6 +11,6 @@ public class PathUtil {
      * @return Resource URL
      */
     public static URL getResourcePath(final String path) {
-        return PathUtil.class.getClassLoader().getResource(path);
+        return PathUtil.class.getResource(path);
     }
 }

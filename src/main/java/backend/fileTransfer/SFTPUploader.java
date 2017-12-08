@@ -32,9 +32,13 @@ public class SFTPUploader implements Uploader {
 
     }
 
-    public void uploadFile(String filePath) throws FileNotFoundException, SftpException {
-        File f = new File(filePath);
-        sftpChannel.put(new FileInputStream(f), f.getName());
+    public void uploadFile(String filePath) throws FileNotFoundException {
+        try {
+            File f = new File(filePath);
+            sftpChannel.put(new FileInputStream(f), f.getName());
+        } catch (SftpException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setRemotePath(String path) throws SftpException {

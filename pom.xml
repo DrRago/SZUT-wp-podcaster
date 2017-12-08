@@ -24,22 +24,10 @@
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.16</version>
-            <scope>provided</scope>
+            <artifactId>lombok-maven-plugin</artifactId>
+            <version>1.16.18.1</version>
+            <type>maven-plugin</type>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.16</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.1.Final</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/net.sf.javamusictag/jid3lib -->
         <dependency>
             <groupId>net.sf.javamusictag</groupId>
             <artifactId>jid3lib</artifactId>

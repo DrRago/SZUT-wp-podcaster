@@ -1,4 +1,4 @@
-package backend.podcast;
+package backend.MediaFactory;
 
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
@@ -7,13 +7,13 @@ import org.farng.mp3.id3.AbstractID3v2;
 import java.io.File;
 import java.io.IOException;
 
-public class PodcastMP3 {
+public class PodcastMP3 implements MediaFile{
     private MP3File mp3File;
     private AbstractID3v2 id3Tags;
 
     private String ID3_Title;
     private String ID3_Artist;
-    private String ID3_Ablum;
+    private String ID3_Album;
     private String ID3_ReleaseYear;
     private String ID3_Comment;
     private String ID3_Genre;
@@ -30,6 +30,7 @@ public class PodcastMP3 {
 
         this.ID3_Title = this.id3Tags.getSongTitle();
         this.ID3_Artist = this.id3Tags.getLeadArtist();
+        this.ID3_Album  = this.id3Tags.getAlbumTitle();
         this.ID3_ReleaseYear = this.id3Tags.getYearReleased();
         this.ID3_Comment = this.id3Tags.getSongComment();
         this.ID3_Genre = this.id3Tags.getSongComment();
@@ -40,9 +41,7 @@ public class PodcastMP3 {
     private void updateTags() {
         try {
             mp3File.save();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TagException e) {
+        } catch (IOException | TagException e) {
             e.printStackTrace();
         }
     }
@@ -101,17 +100,13 @@ public class PodcastMP3 {
         return bitrate;
     }
 
-    public void setBitrate(int bitrate) {
-        this.bitrate = bitrate;
+    public String getID3_Album() {
+        return ID3_Album;
     }
 
-    public String getID3_Ablum() {
-        return ID3_Ablum;
-    }
-
-    public void setID3_Ablum(String ID3_Ablum) {
+    public void setID3_Album(String ID3_Ablum) {
         this.id3Tags.setAlbumTitle(ID3_Ablum);
         this.updateTags();
-        this.ID3_Ablum = ID3_Ablum;
+        this.ID3_Album = ID3_Ablum;
     }
 }

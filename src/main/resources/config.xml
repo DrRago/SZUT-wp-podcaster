@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <hostname>tandashi.de</hostname>
+    <port>123</port>
+    <workingDir>/home/remote/</workingDir>
+    <protocol>sftp</protocol>
+    <username>remote</username>
+    <password>12345</password>
+</config>

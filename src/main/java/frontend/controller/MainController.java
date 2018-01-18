@@ -156,8 +156,7 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SettingController controller = fxmlLoader.getController();
-        controller.init();
+        OptionController controller = fxmlLoader.getController();
         stageSettings.setTitle("WP-Podcaster - Settings");
         stageSettings.setScene(new Scene(root));
         stageSettings.show();

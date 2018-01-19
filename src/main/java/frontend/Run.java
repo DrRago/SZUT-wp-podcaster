@@ -28,6 +28,8 @@ public class Run extends Application{
 
 			primaryStage.setMinWidth(400);
 			primaryStage.setMinHeight(300);
+			primaryStage.setMaxHeight(600);
+			primaryStage.setMaxWidth(1000);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

@@ -29,7 +29,7 @@
                         <MenuItem mnemonicParsing="false" text="Open…" />
                         <Menu mnemonicParsing="false" text="Open Recent" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#MenuSettings" text="Options">
+                        <MenuItem mnemonicParsing="false" onAction="#menuSettings" text="Options">
                             <graphic>
                                 <ImageView fitHeight="20.0" fitWidth="20.0">
                                     <image>
@@ -39,7 +39,7 @@
                             </graphic>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#MenuClose" text="Quit" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Quit" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">

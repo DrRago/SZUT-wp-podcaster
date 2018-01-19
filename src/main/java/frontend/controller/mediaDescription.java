@@ -16,23 +16,17 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class mediaDescription {
 
     @FXML
     private TextArea textAreaDescrption;
-
     @FXML
     private TextField textFieldAuthor;
-
     @FXML
     private AnchorPane mediaDesPane;
-
     @FXML
     public HBox hBoxListView;
-
-    FileChooser fileChooser = new FileChooser();
 
     @Getter
     @Setter
@@ -50,9 +44,7 @@ public class mediaDescription {
     @FXML
     public Media btnNewMedia(ActionEvent event) {
 
-        configureFileChooser(fileChooser);
-
-        List<File> list = fileChooser.showOpenMultipleDialog(new Stage());
+        List<File> list = configureFileChooser();
 
         if (list != null) {
 
@@ -78,7 +70,8 @@ public class mediaDescription {
         return null;
     }
 
-    private static void configureFileChooser(final FileChooser fileChooser) {
+    private static List<File> configureFileChooser() {
+        FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("New Media");
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home"))
@@ -89,5 +82,7 @@ public class mediaDescription {
                 new FileChooser.ExtensionFilter("MP3", "*.mp3"),
                 new FileChooser.ExtensionFilter("MP4", "*.mp4")
         );
+
+        return fileChooser.showOpenMultipleDialog(new Stage());
     }
 }

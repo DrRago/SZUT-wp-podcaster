@@ -107,7 +107,7 @@ public class PodcastController {
 
         hboxMain.setStyle("-fx-start-margin: 5px");
 
-        //For the MediaSettingHbox (TODO: not nessecery)
+        //For the MediaSettingHbox (TODO: not necessary)
         VBox mediaSettingVbox = new VBox();
 
         //For the Stop,Play,Pause Buttons

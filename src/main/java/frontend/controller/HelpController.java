@@ -6,6 +6,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
+import util.PathUtil;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -13,22 +14,14 @@ import java.nio.file.Path;
 public class HelpController {
 
     @FXML
-    private AnchorPane mainPane;
-
-    @FXML
-    private Label title;
-
-    @FXML
     private TextArea text;
 
     public void initialize() throws IOException {
 
-        title.setStyle("-fx-font: 30px bold");
-        title.setTextFill(Color.web("#00769D"));
-        title.setText("About WordPress - Podcaster");
+        // Load the helpfile
+        File file = new File(PathUtil.getResourcePath("HelpText.txt").getPath());
 
-        File file = new File(getClass().getClassLoader().getResource("HelpText.txt").getPath());
-
+        // Display the content of the helpfile
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {

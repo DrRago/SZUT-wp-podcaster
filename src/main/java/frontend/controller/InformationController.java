@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class InformationController {
+    //Todo: Add dependency to backend
 
     @Getter
     @Setter

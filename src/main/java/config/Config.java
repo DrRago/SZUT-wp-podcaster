@@ -24,6 +24,13 @@ public class Config {
     private String username;
     private String password;
 
+    private String id3_title;
+    private String id3_artist;
+    private String id3_year;
+    private String id3_comment;
+    private String id3_genre;
+    private int mp3_bitrate;
+
     public Config() {
         try {
             File fXmlFile = new File(PathUtil.getResourcePath("config.xml").getPath());
@@ -115,5 +122,12 @@ public class Config {
     public void setPassword(String password) {
         this.password = password;
         setElementText("password", password);
+    }
+
+    public static void saveConfig(String password, String hostname, String username, String workingDir,
+                                  Protocols protocol , double mp3_bitrate, String id3_title, String id3_artist,
+                                  String id3_year, String id3_comment, String id3_genre) {
+        //Todo: just do it
+
     }
 }

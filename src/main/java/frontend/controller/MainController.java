@@ -38,14 +38,21 @@ public class MainController {
 
     private Region pane;
 
+    // Object to interact wiht for data
     private InformationController controller = null;
 
+    // Initialize windows for easy access
     public static Stage stagePodcast = new Stage();
     private Stage stageSettings = new Stage();
     private Stage stageHelp = new Stage();
 
     private ObservableList tableData = FXCollections.observableArrayList();
 
+    /**
+     * Initialize the main window
+     * Set a status bar for progress on upload
+     * Load default images
+     */
     public void initialize() {
         statusbar.setProgress(0.0);
         try {
@@ -55,33 +62,57 @@ public class MainController {
         }
         statusTypeLabel.setVisible(false);
         statusbar.setVisible(false);
+
         stagePodcast.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
         stageHelp.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
         stageSettings.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
     }
 
+    /**
+     * Add a new entry through the menubar
+     * @param event
+     */
     @FXML
     void menuNew(ActionEvent event){
         btnAddNew(event);
     }
 
+    /**
+     * Access the Settings-Window through the menubar
+     * @param event
+     */
     @FXML
-    void MenuSettings(ActionEvent event) {
+    void menuSettings(ActionEvent event) {
         openSetting();
     }
 
+    /**
+     * Close the program through the menubar
+     * @param event
+     */
     @FXML
-    void MenuClose(ActionEvent event) {
+    void menuClose(ActionEvent event) {
         System.exit(0);
     }
 
-
+    /**
+     * Remove an entry through the menubar
+     * @param event
+     */
     @FXML
     void menuRemove(ActionEvent event){btnRemove(event);}
 
+    /**
+     * Access the Edit-Pane through the menubar
+     * @param event
+     */
     @FXML
     void menuEdit(ActionEvent event){btnEdit(event);}
 
+    /**
+     * Open a Help-Window
+     * @param event
+     */
     @FXML
     void menuHelp(ActionEvent event){
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Help.fxml"));
@@ -98,11 +129,19 @@ public class MainController {
         stageHelp.show();
     }
 
+    /**
+     * Open the settings window through the button
+     * @param event
+     */
     @FXML
     void settingAction(ActionEvent event) {
         openSetting();
     }
 
+    /**
+     * Add a new entry through the button
+     * @param event
+     */
     @FXML
     void btnAddNew(ActionEvent event) {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Podcast.fxml"));
@@ -124,7 +163,10 @@ public class MainController {
         stagePodcast.setMinWidth(600);
     }
 
-
+    /**
+     * Edit an entry through the button
+     * @param event
+     */
     @FXML
     void btnEdit(ActionEvent event) {
         //if(tableView.getSelectionModel().getSelectedItems() != null && !pane.isVisible()) {
@@ -133,6 +175,10 @@ public class MainController {
         //}
     }
 
+    /**
+     * Remove an entry through the button
+     * @param event
+     */
     @FXML
     void btnRemove(ActionEvent event) {
         closePane();
@@ -148,6 +194,9 @@ public class MainController {
 
     }
 
+    /**
+     * Main method to initialize and open the settings window
+     */
     void openSetting() {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Option.fxml"));
         Parent root = null;
@@ -163,6 +212,10 @@ public class MainController {
         stageSettings.show();
     }
 
+    /**
+     * Main method to open the information part for uploading
+     * @throws IOException
+     */
     void loadPane() throws IOException {
 
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
@@ -179,15 +232,21 @@ public class MainController {
         pane.setVisible(false);
     }
 
+    /**
+     * Main method to open the sidepane for editing
+     */
     void openPane() {
         VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
-        VBoxEdt.setMaxHeight(mainHbox.getMaxHeight()); //??????????????
+        VBoxEdt.setMaxHeight(mainHbox.getMaxHeight());
         VBoxEdt.setMargin(mainHbox, new Insets(5,5,0,0));
         VBoxEdt.getChildren().add(pane);
         pane.setVisible(true);
         statusbar.setProgress(0.5);
     }
 
+    /**
+     * Main method to close the sidepane
+     */
     void closePane() {
         VBoxEdt.setMargin(mainHbox, new Insets(0,0,0,0));
         VBoxEdt.setMaxWidth(0);
@@ -195,10 +254,16 @@ public class MainController {
         pane.setVisible(false);
     }
 
+    /**
+     * Close the podcast window
+     */
     public void closePodcast() {
         stagePodcast.close();
     }
 
+    /**
+     * Close the settings window
+     */
     public void closeOption() { stageSettings.close();
     }
 }

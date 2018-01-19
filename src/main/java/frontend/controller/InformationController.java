@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -26,20 +28,32 @@ public class InformationController {
     private VBox vboxList;
 
     @FXML
-    public ListView titleListView;
+    public AnchorPane informationPane;
 
     @FXML
-    public AnchorPane informationPane;
+    private TextField titleTextField;
+
+    @FXML
+    private TextField authorTextField;
+
+    @FXML
+    private TextField albumTextField;
+
+    @FXML
+    private TextField yearTextField;
+
+    @FXML
+    private TextField genreTextField;
+
+    @FXML
+    private TextArea commentTextField;
+
+    @FXML
+    private ListView<?> titleListView;
+
 
 
     public void initialize() {
-
-        titleLabel.setStyle("-fx-font: 50px bold");
-        titleLabel.setTextFill(Color.web("#00769D"));
-        titleLabel.setText("Hey");
-        titleLabel.setVisible(false);
-        if(titleLabel.isVisible()) titleListView.setVisible(false);
-        else titleListView.setVisible(true);
     }
 
     @FXML

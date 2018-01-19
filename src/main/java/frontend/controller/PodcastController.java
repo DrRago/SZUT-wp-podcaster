@@ -3,12 +3,15 @@ package frontend.controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 
 import javafx.scene.image.Image;
@@ -44,6 +47,10 @@ public class PodcastController {
     @FXML
     private HBox hboxMain;
 
+    private MediaPlayer player;
+
+    private AnchorPane box;
+
     private mediaDescription mediaDescriptioncontroller = null;
 
     public void init() {
@@ -56,83 +63,64 @@ public class PodcastController {
 
 
     public void btnAccept(ActionEvent event) {
-
-    }
-
-    public void btnCancel(ActionEvent event) {
-        //mv.getMediaPlayer().stop();
+        player.stop();
         controller.closePodcast();
     }
 
-    private static void configureFileChooser(final FileChooser fileChooser) {
-        fileChooser.setTitle("New Media");
-        fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
-        );
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Media", "*.mp3","*.mp4"),
-                new FileChooser.ExtensionFilter("MP3", "*.mp3"),
-                new FileChooser.ExtensionFilter("MP4", "*.mp4")
-        );
+    public void btnCancel(ActionEvent event) {
+        player.stop();
+        controller.closePodcast();
     }
-
-    private Region box;
 
     void openMediaDes() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/mediaDescription.fxml"));
         box = fxmlLoader.load();
 
-        //Region n = fxmlLoader.load();
-
-        //box.maxWidthProperty().bind(pane.widthProperty());
-        //box.maxHeightProperty().bind(pane.heightProperty());
-
         mediaDescriptioncontroller = fxmlLoader.getController();
         mediaDescriptioncontroller.setController(this);
-/*
-        box.minHeightProperty().bind(paneLoadMediaDes.heightProperty());
-        box.maxHeightProperty().bind(paneLoadMediaDes.heightProperty());
-        box.minWidthProperty().bind(rootPane.widthProperty().subtract(5));
-        box.maxWidthProperty().bind(rootPane.widthProperty().subtract(5));
-        paneLoadMediaDes.maxWidthProperty().bind(rootPane.maxWidthProperty());*/
-        // Create new Anchor Pane for the SidePane
-        //pane = new AnchorPane(box);
-        // Hide the new Anchor Pane for the SidePane
-        //pane.setVisible(true);
 
         paneLoadMediaDes.getChildren().add(box);
-
-        //hboxMain.getChildren().add(pane);
     }
-    
-
-    void openMedia(Media media) {
 
 
-        MediaPlayer player = new MediaPlayer(media);
+
+    void showMediaList(ObservableList<Media> items, ObservableList<String> mediaName){
+        ListView<String> itemList = new ListView<>();
+        if(items.size()>=1){
+            openMediaView(items.get(0), items, itemList);
+            itemList.setItems(mediaName);
+        }
+        else{
+            for(int i = 0; i<items.size(); i++){
+                itemList.setItems(mediaName);
+            }
+        }
+    }
+
+    void openMediaView(Media media, ObservableList<Media> items, ListView<String> itemList) {
+
+        VBox mediaVBox = new VBox();
+
+        player = new MediaPlayer(media);
         MediaView mv = new MediaView(player);
 
         hboxMain.setStyle("-fx-start-margin: 5px");
 
-        VBox mediaVBox = new VBox();
-        VBox podcastVBox = new VBox();
-
-        Pane emptyPane = new Pane();
-
+        //For the MediaSettingHbox (TODO: not nessecery)
         VBox mediaSettingVbox = new VBox();
-        //Stop,Play,Pause
+
+        //For the Stop,Play,Pause Buttons
         HBox mediaSettingHbox = new HBox();
 
         hboxMain.getChildren().add(mv);
 
         hboxMain.setVisible(false);
-        //hboxMain.getChildren().add(podcastVBox);
 
+        mv.setSmooth(true); //Loads the Mediafile before starting the player -> no lags while playing
 
-        mv.setSmooth(true);
-            /*
-             * Buttons
-             */
+        /*
+         * Button pause
+         */
         Image imgPause = new Image(getClass().getResourceAsStream("/icons/pause-icon.png"));
         Button btnPause = new Button();
         ImageView imgVPause = new ImageView(imgPause);
@@ -143,10 +131,13 @@ public class PodcastController {
             @Override
             public void handle(ActionEvent e) {
                 player.pause();
-                btnPause.setStyle("-fx-background-color: aliceblue");
+                btnPause.setStyle("-fx-background-color: lightblue");
             }
         });
 
+        /*
+         * Button play
+         */
         Image imgPlay = new Image(getClass().getResourceAsStream("/icons/play-icon.png"));
         Button btnPlay = new Button();
         ImageView imgVPlay = new ImageView(imgPlay);
@@ -165,6 +156,9 @@ public class PodcastController {
             }
         });
 
+        /*
+         * Button Stop
+         */
         Image imgStop = new Image(getClass().getResourceAsStream("/icons/stop-icon.png"));
         Button btnStop = new Button();
         ImageView imgVStop = new ImageView(imgStop);
@@ -179,33 +173,44 @@ public class PodcastController {
             }
         });
         mediaSettingHbox.getChildren().addAll(btnPlay, btnPause, btnStop);
-
+        //Style of the Buttons
         btnStop.setStyle("-fx-background-color: transparent");
         btnPlay.setStyle("-fx-background-color: transparent");
         btnPause.setStyle("-fx-background-color: transparent");
 
-        Slider slider = new Slider();
 
+        //Add the children
         mediaSettingVbox.getChildren().add(mediaSettingHbox);
         mediaVBox.getChildren().addAll(mv, mediaSettingVbox);
 
-        hboxMain.getChildren().remove(emptyPane);
-
-        //hboxMain.setVisible(false);
         hboxMain.getChildren().add(0, mediaVBox);
+
+
+        //If the MediaPlayer is in the mediaVBox
+        if (mediaVBox.getChildren().get(0) == mv) {
+            //Add the itemList to the mediaVBox
+            mediaVBox.getChildren().add(mediaVBox.getChildren().size(), itemList);
+        }
+        //Add the media to the items
+        items.add(media);
+
+        Slider slider = new Slider();
 
         player.setOnReady(new Runnable() {
             @Override
             public void run() {
-                System.out.println(media.getWidth());
-                int w, h;
-                if (media.getSource().contains(".mp4")) {
-                    w = 680 / 2;
-                    h = 480 / 2;
+                //If the Media is bigger then 1920px1080p TODO: SHOW ERROR "CANT DISPLAY SUCH HIGH RESOLUTION"
+                if (media.getWidth() > 1920) {
+                    System.out.println("Cant display such High Resolution!");
+                }
 
-                } else {
-                    w = 480 / 2;
-                    h = 100;
+                int w = 240; //Set the width
+
+                //Check if the file is a Video or Audio
+                if (media.getSource().contains(".mp4")) {
+                }
+                else {
+                    //Set the Style for the Audio File
                     mediaSettingVbox.setStyle(
                             "-fx-border-style: solid inside;" +
                                     "-fx-border-width: 2;" +
@@ -213,41 +218,33 @@ public class PodcastController {
                                     "-fx-border-radius: 5;" +
                                     "-fx-border-color: grey;");
                 }
+
+                //Add the Slider to the mediaSettingBox
                 mediaSettingHbox.getChildren().add(slider);
 
                 slider.setStyle("-fx-control-inner-background: palegreen");
 
-                //mediaSettingVbox.setTranslateY(((-h / 16) - btnPause.getHeight() / 2) - slider.getHeight());
-                //mediaSettingHbox.setTranslateX(w / 2 - ((btnPause.getWidth()) * 3) / 1.5);
-                //slider.setTranslateY(mediaSettingHbox.getTranslateY());
-                //Is the Video higher then 1920x1080p
-                //if (w <= 1920 / 4 && h <= 1080) {
-                System.out.println("New width: " + w);
-                /////hboxBtn.setVisible(true);
-                /////hboxBtn.setMaxWidth(w);
-                /////hboxBtn.setMinWidth(w);
-
-                mv.setFitHeight(h);
                 mv.setFitWidth(w);
                 slider.setMin(0.0);
                 slider.setValue(0.0);
                 slider.setMax(player.getTotalDuration().toSeconds());
                 slider.setMaxWidth(w);
+                slider.setTranslateY(5);
 
                 mv.setVisible(true);
 
                 slider.setVisible(true);
                 player.setAutoPlay(true);
+                //Start the Media
                 player.play();
 
                 hboxMain.setVisible(true);
-                //} else if (w > 1920 / 4) {
-
-
-                //}
-
             }
         });
+
+        /*
+         * Slider Listener
+         */
         player.currentTimeProperty().addListener(new ChangeListener<Duration>() {
             @Override
             public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration current) {
@@ -256,17 +253,11 @@ public class PodcastController {
         });
 
         slider.valueProperty().addListener(new ChangeListener<Number>() {
-
+            @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 if (slider.getValue() != player.getCurrentTime().toSeconds())
                     player.seek(Duration.seconds(slider.getValue()));
             }
-
         });
     }
-
-
 }
-
-
-//TODO: Erst öffnen und man kann den Namen und so hinzufügen, dann Datei auswählen und daneben auflisten/Anzeigen (AUDIO MACHEN)

@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 
 import java.io.*;
-
+import java.nio.file.Path;
 
 public class HelpController {
 
@@ -21,17 +21,13 @@ public class HelpController {
     @FXML
     private TextArea text;
 
-    @FXML
-    private WebView web;
-
     public void initialize() throws IOException {
 
         title.setStyle("-fx-font: 30px bold");
         title.setTextFill(Color.web("#00769D"));
         title.setText("About WordPress - Podcaster");
 
-        File file = new File("res/HelpText.txt");
-
+        File file = new File(getClass().getClassLoader().getResource("HelpText.txt").getPath());
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -41,8 +37,6 @@ public class HelpController {
             text.selectHome();
             text.deselect();
         }
-
         text.setEditable(false);
-
     }
 }

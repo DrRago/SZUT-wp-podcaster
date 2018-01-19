@@ -7,12 +7,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 
 public class OptionController {
 
-    private static Stage thisStage;
+    @Setter
+    private MainController controller;
 
     @FXML
     PasswordField passwdOption;
@@ -37,10 +40,6 @@ public class OptionController {
     @FXML
     TextField mp3_genre;
 
-    public static void setStage(Stage stage){
-        thisStage = stage;
-    }
-
     public void initialize(){
         // Add a listener to change the label after a value change
         bitrateSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
@@ -55,6 +54,6 @@ public class OptionController {
 
     @FXML
     public void cancelOptions(ActionEvent e){
-        thisStage.close();
+        controller.closeOption();
     }
 }

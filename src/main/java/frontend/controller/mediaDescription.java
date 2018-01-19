@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -15,6 +16,7 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class mediaDescription {
 
@@ -27,33 +29,52 @@ public class mediaDescription {
     @FXML
     private AnchorPane mediaDesPane;
 
+    @FXML
+    public HBox hBoxListView;
+
     FileChooser fileChooser = new FileChooser();
 
     @Getter
     @Setter
     private PodcastController controller;
 
+    public int countingMediaUploads = 0;
+    public int contingMediaFiles = 0;
+
+    private ObservableList<String> mediaName = FXCollections.observableArrayList();
+    private ObservableList<Media> mediaItems = FXCollections.observableArrayList();
+
+    public void initialize() {
+    }
+
     @FXML
     public Media btnNewMedia(ActionEvent event) {
+
         configureFileChooser(fileChooser);
-        ObservableList<Media> mediaItems = FXCollections.observableArrayList();
-            ObservableList<String> mediaName = FXCollections.observableArrayList();
-            List<File> list = fileChooser.showOpenMultipleDialog(new Stage());
-            if (list != null) {
-                for (File file : list) {
-                    Media me = new Media(file.toURI().toString());
 
-                    mediaItems.add(me);
+        List<File> list = fileChooser.showOpenMultipleDialog(new Stage());
 
-                    mediaName.sorted();
+        if (list != null) {
 
-                    String source = me.getSource();
-                    source = source.substring(0, source.length() - ".mp3".length());
-                    source = source.substring(source.lastIndexOf("/") + 1).replaceAll("%20", " ");
-                    mediaName.add(source);
-                }
-                controller.showMediaList(mediaItems, mediaName);
+            for (File file : list) {
+                contingMediaFiles += 1;
+                Media me = new Media(file.toURI().toString());
+
+                if (!mediaItems.contains(me)) mediaItems.add(me);
+
+                String source = me.getSource();
+                source = source.substring(0, source.lastIndexOf("."));
+                source = source.substring(source.lastIndexOf("/") + 1).replaceAll("%20", " ");
+
+                if (!mediaName.contains(source)) mediaName.add(source);
+
+
             }
+
+            countingMediaUploads += 1;
+
+            controller.showMediaList(mediaItems, mediaName);
+        }
         return null;
     }
 

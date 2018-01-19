@@ -3,7 +3,6 @@ package frontend.controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,15 +20,12 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
-import javafx.stage.FileChooser;
-
 import javafx.util.Duration;
 import lombok.Setter;
 import util.PathUtil;
 
-import java.io.File;
-
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 
 public class PodcastController {
@@ -55,7 +51,9 @@ public class PodcastController {
 
     public void init() {
         try {
+
             openMediaDes();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,18 +81,21 @@ public class PodcastController {
     }
 
 
+    private ListView<String> itemList = new ListView<>(); //TODO: ADD LISTENER WITH CELL FACTORY AND MORE
 
     void showMediaList(ObservableList<Media> items, ObservableList<String> mediaName){
-        ListView<String> itemList = new ListView<>();
-        if(items.size()>=1){
+        int countingMediaUploads = mediaDescriptioncontroller.countingMediaUploads;
+        int countingMediaFiles = mediaDescriptioncontroller.contingMediaFiles;
+        if(countingMediaUploads==1){
             openMediaView(items.get(0), items, itemList);
-            itemList.setItems(mediaName);
+            itemList.setItems(mediaName.sorted());
         }
         else{
-            for(int i = 0; i<items.size(); i++){
-                itemList.setItems(mediaName);
-            }
+
+//            /*if(!mediaName.contains(itemList.getItems()))*/itemList.getItems().addAll(mediaName);
+
         }
+        System.out.println(items);
     }
 
     void openMediaView(Media media, ObservableList<Media> items, ListView<String> itemList) {

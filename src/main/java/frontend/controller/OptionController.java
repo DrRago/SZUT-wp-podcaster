@@ -49,6 +49,7 @@ public class OptionController {
     @FXML
     TextField mp3_genre; // in config = id3_genre
 
+    Config config = new Config();
     /**
      * Initialize the settings window
      * Set default values
@@ -73,18 +74,18 @@ public class OptionController {
      */
     @FXML
     public void saveOptions(ActionEvent e){
-        Config.saveConfig(
-        passwdOption.getText(),
-        urlOption.getText(),
-        usrnameOption.getText(),
-        uploadpathOption.getText(),
-        (Protocols) protocolOption.getSelectionModel().getSelectedItem(),
-        bitrateSlider.getValue(),
-        mp3_title.getText(),
-        mp3_artist.getText(),
-        mp3_year.getText(),
-        mp3_comment.getText(),
-        mp3_genre.getText()
+        config.saveConfig(
+                passwdOption.getText(),
+                urlOption.getText(),
+                usrnameOption.getText(),
+                uploadpathOption.getText(),
+                (Protocols) protocolOption.getSelectionModel().getSelectedItem(),
+                bitrateSlider.getValue(),
+                mp3_title.getText(),
+                mp3_artist.getText(),
+                mp3_year.getText(),
+                mp3_comment.getText(),
+                mp3_genre.getText()
         );
         //Todo: use Config class to save
 

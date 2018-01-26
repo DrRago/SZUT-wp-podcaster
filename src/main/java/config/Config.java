@@ -29,7 +29,7 @@ public class Config {
     private String id3_year;
     private String id3_comment;
     private String id3_genre;
-    private int mp3_bitrate;
+    private double mp3_bitrate;
 
     public Config() {
         try {
@@ -55,6 +55,13 @@ public class Config {
                     protocol = Protocols.valueOf(getElementText("protocol").toUpperCase());
                     username = getElementText("username");
                     password = getElementText("password");
+
+                    id3_title = getElementText("id3_title");
+                    id3_artist = getElementText("id3_artist");
+                    id3_year = getElementText("id3_year");
+                    id3_comment = getElementText("id3_comment");
+                    id3_genre = getElementText("id3_genre");
+                    mp3_bitrate = Double.parseDouble(getElementText("mp3_bitrate"));
                 }
             }
         } catch (Exception e) {
@@ -68,6 +75,7 @@ public class Config {
 
     private void setElementText(String element, String text) {
         eElement.getElementsByTagName(element).item(0).setTextContent(text);
+        //Todo: make it work
     }
 
     public String getHostname() {
@@ -124,10 +132,61 @@ public class Config {
         setElementText("password", password);
     }
 
-    public static void saveConfig(String password, String hostname, String username, String workingDir,
+    public double getBitrate(){ return mp3_bitrate; }
+
+    public void setBitrate(double bitrate){
+        this.mp3_bitrate = bitrate;
+        setElementText("mp3_bitrate", Double.toString(bitrate));
+    }
+
+    public String getId3_title() { return id3_title;  }
+
+    public void setId3_title(String id3_title) {
+        this.id3_title = id3_title;
+        setElementText("id3_title", id3_title);
+    }
+
+    public String getId3_artist() { return id3_artist; }
+
+    public void setId3_artist(String id3_artist) {
+        this.id3_artist = id3_artist;
+        setElementText("id3_artist", id3_artist);
+    }
+
+    public String getId3_year() { return id3_year; }
+
+    public void setId3_year(String id3_year) {
+        this.id3_year = id3_year;
+        setElementText("id3_year", id3_year);
+    }
+
+    public String getId3_comment() { return id3_comment; }
+
+    public void setId3_comment(String id3_comment) {
+        this.id3_comment = id3_comment;
+        setElementText("id3_comment", id3_comment);
+    }
+
+    public String getId3_genre() { return id3_genre; }
+
+    public void setId3_genre(String id3_genre) {
+        this.id3_genre = id3_genre;
+        setElementText("id3_genre", id3_genre);
+    }
+
+    public void saveConfig(String password, String hostname, String username, String workingDir,
                                   Protocols protocol , double mp3_bitrate, String id3_title, String id3_artist,
                                   String id3_year, String id3_comment, String id3_genre) {
-        //Todo: just do it
-
+        this.setPassword(password);
+        this.setHostname(hostname);
+        this.setUsername(username);
+        this.setWorkingDir(workingDir);
+        this.setProtocol(protocol);
+        this.setBitrate(mp3_bitrate);
+        this.setId3_title(id3_title);
+        this.setId3_artist(id3_artist);
+        this.setId3_year(id3_year);
+        this.setId3_comment(id3_comment);
+        this.setId3_genre(id3_genre);
     }
 }

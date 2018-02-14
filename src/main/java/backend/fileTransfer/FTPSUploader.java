@@ -1,117 +1,55 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package backend.fileTransfer;
 
-import org.apache.commons.net.PrintCommandListener;
-import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
 
-/***
- * This is an example program demonstrating how to use the FTPSClient class.
- * This program connects to an FTP server and retrieves the specified
- * file.  If the -s flag is used, it stores the local file at the FTP server.
- * Just so you can see what's happening, all reply strings are printed.
- * If the -b flag is used, a binary transfer is assumed (default is ASCII).
- * <p>
- * Usage: ftp [-s] [-b] <hostname> <username> <password> <remote file> <local file>
- * <p>
- ***/
 public class FTPSUploader implements Uploader {
 
-    private FTPSClient ftps;
-    private String username;
-    private String password;
+    private FTPSClient client = new FTPSClient(true);
     private String remote;
 
-    public FTPSUploader() {
-        String server;
-        String protocol = "SSL";    // SSL/TLS
-
-        server = "localhost";
-        username = "test";
-        password = "1234";
-        remote = "";
-
-        ftps = new FTPSClient(protocol);
-
-        ftps.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-
+    public FTPSUploader(String hostname, int port, String username, String password, String workingDir) throws UploaderException {
         try {
-            int reply;
-
-            ftps.connect(server, 21);
-
-            // After connection attempt, you should check the reply code to verify success.
-            reply = ftps.getReplyCode();
-
-            System.out.println(reply);
-
-            if (!FTPReply.isPositiveCompletion(reply)) {
-                ftps.disconnect();
-            }
+            client.connect(hostname, port);
+            client.login(username, password);
         } catch (IOException e) {
-            if (ftps.isConnected()) {
-                try {
-                    ftps.disconnect();
-                } catch (IOException f) {
-                    // do nothing
-                }
-            }
-            e.printStackTrace();
-            System.exit(1);
+            throw new UploaderException(e);
         }
+        client.enterLocalPassiveMode();
+        remote = workingDir;
     }
 
     @Override
-    public void uploadFile(String filePath) {
-        try {
-            ftps.setBufferSize(1000);
+    public String uploadFile(String filePath) throws UploaderException {
 
-            if (!ftps.login(username, password)) {
-                ftps.logout();
-            }
+        File file = new File(filePath);
 
-
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            // ftps.enterLocalPassiveMode();
-
-            InputStream input;
-            input = new FileInputStream(new File(filePath));
-            ftps.storeFile(remote, input);
-
-            input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!file.exists()) {
+            throw new UploaderException(new FileNotFoundException("File " + filePath + " not found"));
         }
+
+        // Create an InputStream of the file to be uploaded
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            // Store file to server
+            client.storeFile(Paths.get(remote, file.getName()).toString(), fis);
+
+            fis.close();
+        } catch (IOException e) {
+            throw new UploaderException(e);
+        }
+        return client.getReplyString();
     }
 
     @Override
-    public void disconnect() {
-        try {
-            ftps.logout();
-            ftps.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+    public void disconnect() throws IOException {
+        client.logout();
+        client.disconnect();
     }
 }

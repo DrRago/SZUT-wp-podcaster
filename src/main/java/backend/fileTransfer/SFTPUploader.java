@@ -11,7 +11,7 @@ public class SFTPUploader implements Uploader {
     private ChannelSftp sftpChannel;
     private Session session;
 
-    public SFTPUploader(String URL, int port, String username, String password, String workingDir) {
+    public SFTPUploader(String URL, int port, String username, String password, String workingDir) throws UploaderException {
         Channel channel;
 
         try {
@@ -27,18 +27,14 @@ public class SFTPUploader implements Uploader {
             sftpChannel = (ChannelSftp) channel;
             setRemotePath(workingDir);
         } catch (JSchException | SftpException e) {
-            e.printStackTrace();
+            throw new UploaderException(e);
         }
-
     }
 
-    public void uploadFile(String filePath) throws FileNotFoundException {
-        try {
-            File f = new File(filePath);
-            sftpChannel.put(new FileInputStream(f), f.getName());
-        } catch (SftpException e) {
-            e.printStackTrace();
-        }
+    public String uploadFile(String filePath) throws FileNotFoundException, SftpException {
+        File f = new File(filePath);
+        sftpChannel.put(new FileInputStream(f), f.getName());
+        return "200";
     }
 
     private void setRemotePath(String path) throws SftpException {

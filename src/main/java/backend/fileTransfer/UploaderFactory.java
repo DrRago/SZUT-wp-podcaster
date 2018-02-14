@@ -1,9 +1,5 @@
 package backend.fileTransfer;
 
-/**
- * @author Leonhard Gahr
- * @author Pascal de Vries
- */
 public class UploaderFactory {
     public Uploader getUploader(Protocols protocol, String serverURL, int port, String username, String password, String workingDir) throws UploaderException {
         switch (protocol) {

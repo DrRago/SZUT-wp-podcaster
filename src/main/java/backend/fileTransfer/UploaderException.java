@@ -1,9 +1,5 @@
 package backend.fileTransfer;
 
-/**
- * @author Leonhard Gahr
- * @author Pascal de Vries
- */
 public class UploaderException extends Exception {
 
     public UploaderException() {

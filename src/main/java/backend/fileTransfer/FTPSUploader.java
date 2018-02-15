@@ -1,5 +1,6 @@
 package backend.fileTransfer;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.File;
@@ -17,6 +18,8 @@ public class FTPSUploader implements Uploader {
         try {
             client.connect(hostname, port);
             client.login(username, password);
+            // change filetype to binary to prevent a transmission failure (see issue #1)
+            client.setFileType(FTP.BINARY_FILE_TYPE);
         } catch (IOException e) {
             throw new UploaderException(e);
         }
@@ -34,7 +37,7 @@ public class FTPSUploader implements Uploader {
         }
 
         // Create an InputStream of the file to be uploaded
-        FileInputStream fis = null;
+        FileInputStream fis;
         try {
             fis = new FileInputStream(file);
             // Store file to server

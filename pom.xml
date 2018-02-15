@@ -49,5 +49,11 @@
             <artifactId>jwordpress</artifactId>
             <version>0.6.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
     </dependencies>
 </project>

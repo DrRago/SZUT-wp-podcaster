@@ -7,9 +7,10 @@ import org.farng.mp3.id3.AbstractID3v2;
 import java.io.File;
 import java.io.IOException;
 
-public class PodcastMP3 implements MediaFile{
+public class ID3TagUtil {
     private MP3File mp3File;
     private AbstractID3v2 id3Tags;
+    private File file;
 
     private String ID3_Title;
     private String ID3_Artist;
@@ -18,29 +19,26 @@ public class PodcastMP3 implements MediaFile{
     private String ID3_Comment;
     private String ID3_Genre;
 
-    private int bitrate;
-
-    public PodcastMP3(String path) throws IOException, TagException {
-        this.mp3File = new MP3File(new File(path));
+    ID3TagUtil(String path) throws IOException, TagException {
+        this.file = new File(path);
+        this.mp3File = new MP3File(this.file);
 
         // parse information from mp3 header
-        mp3File.seekMP3Frame();
+        this.mp3File.seekMP3Frame();
 
         this.id3Tags = mp3File.getID3v2Tag();
 
         this.ID3_Title = this.id3Tags.getSongTitle();
         this.ID3_Artist = this.id3Tags.getLeadArtist();
-        this.ID3_Album  = this.id3Tags.getAlbumTitle();
+        this.ID3_Album = this.id3Tags.getAlbumTitle();
         this.ID3_ReleaseYear = this.id3Tags.getYearReleased();
         this.ID3_Comment = this.id3Tags.getSongComment();
-        this.ID3_Genre = this.id3Tags.getSongComment();
-
-        this.bitrate = mp3File.getBitRate();
+        this.ID3_Genre = this.id3Tags.getSongGenre();
     }
 
     private void updateTags() {
         try {
-            mp3File.save();
+            this.mp3File.save();
         } catch (IOException | TagException e) {
             e.printStackTrace();
         }
@@ -51,7 +49,7 @@ public class PodcastMP3 implements MediaFile{
     }
 
     public void setID3_Title(String ID3_Title) {
-        id3Tags.setSongTitle(ID3_Title);
+        this.id3Tags.setSongTitle(ID3_Title);
         this.updateTags();
         this.ID3_Title = ID3_Title;
     }
@@ -96,10 +94,6 @@ public class PodcastMP3 implements MediaFile{
         this.ID3_Genre = ID3_Genre;
     }
 
-    public int getBitrate() {
-        return bitrate;
-    }
-
     public String getID3_Album() {
         return ID3_Album;
     }
@@ -108,5 +102,13 @@ public class PodcastMP3 implements MediaFile{
         this.id3Tags.setAlbumTitle(ID3_Ablum);
         this.updateTags();
         this.ID3_Album = ID3_Ablum;
+    }
+
+    public int getBitrate() {
+        return mp3File.getBitRate();
+    }
+
+    public File getFile() {
+        return file;
     }
 }

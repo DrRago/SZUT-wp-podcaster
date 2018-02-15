@@ -5,13 +5,15 @@ import com.jcraft.jsch.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Logger;
 
 public class SFTPUploader implements Uploader {
+    private static final java.util.logging.Logger LOGGER = Logger.getGlobal();
 
     private ChannelSftp sftpChannel;
     private Session session;
 
-    public SFTPUploader(String URL, int port, String username, String password, String workingDir) throws UploaderException {
+    SFTPUploader(String URL, int port, String username, String password, String workingDir) throws UploaderException {
         Channel channel;
 
         try {
@@ -25,24 +27,30 @@ public class SFTPUploader implements Uploader {
             channel = session.openChannel("sftp");
             channel.connect();
             sftpChannel = (ChannelSftp) channel;
+            LOGGER.info(String.format("connected to %s:%d", URL, port));
             setRemotePath(workingDir);
         } catch (JSchException | SftpException e) {
+            LOGGER.severe(e.getMessage());
             throw new UploaderException(e);
         }
     }
 
     public String uploadFile(String filePath) throws FileNotFoundException, SftpException {
+        LOGGER.info(String.format("uploading file \"%s\" to %s", filePath, session.getHost()));
         File f = new File(filePath);
         sftpChannel.put(new FileInputStream(f), f.getName());
+        LOGGER.info("upload successful");
         return "200";
     }
 
     private void setRemotePath(String path) throws SftpException {
         sftpChannel.cd(path);
+        LOGGER.info(String.format("remote path set to \"%s\"", path));
     }
 
     public void disconnect() {
         sftpChannel.exit();
         session.disconnect();
+        LOGGER.info(String.format("disconnected from %s", session.getHost()));
     }
 }

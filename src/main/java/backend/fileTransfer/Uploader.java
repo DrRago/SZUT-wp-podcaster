@@ -1,9 +1,11 @@
 package backend.fileTransfer;
 
-import java.io.FileNotFoundException;
+import com.jcraft.jsch.SftpException;
+
+import java.io.IOException;
 
 public interface Uploader {
-    void uploadFile(String filePath) throws FileNotFoundException;
+    String uploadFile(String filePath) throws IOException, SftpException, UploaderException;
 
-    void disconnect();
+    void disconnect() throws IOException;
 }

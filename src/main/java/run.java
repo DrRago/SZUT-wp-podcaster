@@ -1,24 +1,36 @@
-import backend.MediaFactory.MediaFactory;
-import backend.MediaFactory.MediaFile;
-import config.Config;
-import org.farng.mp3.TagException;
+import backend.MediaFactory.Lame;
+import backend.fileTransfer.Protocols;
+import backend.fileTransfer.Uploader;
+import backend.fileTransfer.UploaderFactory;
+import backend.wordpress.Blog;
+import backend.LoggerFormatter.MyFormatter;
 
-import java.io.IOException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 
-/**
- * @author Leonhard Gahr
- * @author Pascal de Vries
- */
 public class run {
-    public static void main(String[] args) throws IOException, TagException {
-        MediaFile mp3 = MediaFactory.getMedia("mp3", "C:\\Users\\Leonhard.Gahr\\Downloads\\SFGrenade - Dual Wield.mp3");
-        assert mp3 != null;
-        mp3.setID3_Title("New Title");
-        mp3.setID3_Artist("New Artist");
-        mp3.setID3_Comment("New Comment");
-        mp3.setID3_Genre("New Genre");
-        mp3.setID3_ReleaseYear("2017");
-        mp3.setID3_Album("New Album");
-        new Config().setPassword("1244254224");
+    private static final Logger LOGGER = Logger.getGlobal();
+
+    public static void main(String[] args) {
+        LOGGER.setUseParentHandlers(false);
+
+        MyFormatter formatter = new MyFormatter();
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(formatter);
+
+        LOGGER.addHandler(handler);
+
+        try {
+            Uploader uploader = UploaderFactory.getUploader(Protocols.FTPS, "localhost", 990, "root", "12345", "/uploads/");
+
+            Lame lame = new Lame("C:\\Users\\Leonhard.Gahr\\Downloads\\SFGrenade - Rhythm of the Dancefloor.mp3");
+            lame.executeCommand();
+
+            Blog blog = new Blog("admin", "12345", "http://localhost/wp/xmlRpc.php", uploader);
+            blog.addPost("Test", "publish", "http://localhost/uploads/", lame);
+            uploader.disconnect();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }

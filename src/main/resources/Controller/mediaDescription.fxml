@@ -28,7 +28,7 @@
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
                   </ComboBox>
-                  <TextField fx:id="textfieldTitle" promptText="Title">
+                  <TextField fx:id="textFieldTitle" promptText="Title">
                      <VBox.margin>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
@@ -38,7 +38,7 @@
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
                   </TextField>
-                  <TextField fx:id="textfieldAlbum" promptText="Album">
+                  <TextField fx:id="textFieldAlbum" promptText="Album">
                      <VBox.margin>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>

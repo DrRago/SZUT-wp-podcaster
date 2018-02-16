@@ -1,6 +1,10 @@
 package frontend.controller;
 
 
+import backend.MediaFactory.Lame;
+import backend.fileTransfer.UploaderException;
+import backend.wordpress.Blog;
+import com.jcraft.jsch.SftpException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -22,9 +26,14 @@ import javafx.scene.media.MediaView;
 
 import javafx.util.Duration;
 import lombok.Setter;
+import net.bican.wordpress.exceptions.InsufficientRightsException;
+import net.bican.wordpress.exceptions.InvalidArgumentsException;
+import net.bican.wordpress.exceptions.ObjectNotFoundException;
+import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 
@@ -47,22 +56,36 @@ public class PodcastController {
 
     private AnchorPane box;
 
-    private mediaDescription mediaDescriptioncontroller = null;
+    private mediaDescription mediaDescriptioncontroller;
+    private OptionController optionController;
+
+    private ListView<Lame> itemList = new ListView<>();
+    private MediaView mv;
 
     public void init() {
         try {
-
             openMediaDes();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        itemList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Lame>() {
+            public void changed(ObservableValue<? extends Lame> observable, Lame oldValue, Lame newValue) {
+                player.stop();
+                hboxMain.getChildren().remove(0);
+                openMediaView(mediaDescriptioncontroller.lameItems, new Media(newValue.getMP3File().toURI().toString()));
+            }
+        });
     }
 
-
-    public void btnAccept(ActionEvent event) {
-        player.stop();
+    public void btnAccept(ActionEvent event) throws IOException, SftpException, XmlRpcFault, ObjectNotFoundException, UploaderException, InvalidArgumentsException, InsufficientRightsException {
+        if(player!=null)player.stop();
         controller.closePodcast();
+        Blog blog = new Blog(optionController.usrnameOption.getText(), optionController.passwdOption.getText(), "http://localhost/wp/xmlRpc.php" , optionController.uploader);
+        ObservableList<Lame> lameItems = mediaDescriptioncontroller.lameItems;
+        for(int i = 0; lameItems.size()>i; i++){
+            blog.addPost(lameItems.get(i).getID3_Title(),mediaDescriptioncontroller.pendingState.getSelectionModel().toString() , optionController.uploadpathOption.getText(), lameItems.get(i));
+        }
     }
 
     public void btnCancel(ActionEvent event) {
@@ -80,30 +103,30 @@ public class PodcastController {
         paneLoadMediaDes.getChildren().add(box);
     }
 
+    void showMediaList(ObservableList<Lame> items){
+            openMediaView(items, new Media(items.get(0).getMP3File().toURI().toString()));
+            for(int i = 0; i<items.size(); i++){
+                itemList.getItems().addAll(items.get(i));
+            }
 
-    private ListView<String> itemList = new ListView<>(); //TODO: ADD LISTENER WITH CELL FACTORY AND MORE
-
-    void showMediaList(ObservableList<Media> items, ObservableList<String> mediaName){
-        int countingMediaUploads = mediaDescriptioncontroller.countingMediaUploads;
-        int countingMediaFiles = mediaDescriptioncontroller.contingMediaFiles;
-        if(countingMediaUploads==1){
-            openMediaView(items.get(0), items, itemList);
-            itemList.setItems(mediaName.sorted());
-        }
-        else{
-
-//            /*if(!mediaName.contains(itemList.getItems()))*/itemList.getItems().addAll(mediaName);
-
-        }
-        System.out.println(items);
     }
 
-    void openMediaView(Media media, ObservableList<Media> items, ListView<String> itemList) {
+    void openMediaView(ObservableList<Lame> items, Media item) {
+        //TODO: Neu schreiben und ID3 Tags für einzelne Lame Objektives machen
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
         VBox mediaVBox = new VBox();
 
-        player = new MediaPlayer(media);
-        MediaView mv = new MediaView(player);
+        //Media media = new Media(items.get(0).getMP3File().toURI().toString());
+
+        player = new MediaPlayer(item);
+        mv = new MediaView(player);
 
         hboxMain.setStyle("-fx-start-margin: 5px");
 
@@ -150,7 +173,7 @@ public class PodcastController {
             public void handle(ActionEvent e) {
                 player.play();
                 btnPause.setStyle("-fx-background-color: transparent");
-                if (player.getCurrentTime().toSeconds() == media.getDuration().toSeconds()) {
+                if (player.getCurrentTime().toSeconds() == item.getDuration().toSeconds()) {
                     player.stop();
                     player.play();
                 }
@@ -192,8 +215,6 @@ public class PodcastController {
             //Add the itemList to the mediaVBox
             mediaVBox.getChildren().add(mediaVBox.getChildren().size(), itemList);
         }
-        //Add the media to the items
-        items.add(media);
 
         Slider slider = new Slider();
 
@@ -201,16 +222,12 @@ public class PodcastController {
             @Override
             public void run() {
                 //If the Media is bigger then 1920px1080p TODO: SHOW ERROR "CANT DISPLAY SUCH HIGH RESOLUTION"
-                if (media.getWidth() > 1920) {
+                if (item.getWidth() > 1920) {
                     System.out.println("Cant display such High Resolution!");
                 }
 
                 int w = 240; //Set the width
 
-                //Check if the file is a Video or Audio
-                if (media.getSource().contains(".mp4")) {
-                }
-                else {
                     //Set the Style for the Audio File
                     mediaSettingVbox.setStyle(
                             "-fx-border-style: solid inside;" +
@@ -218,8 +235,6 @@ public class PodcastController {
                                     "-fx-border-insets: 5;" +
                                     "-fx-border-radius: 5;" +
                                     "-fx-border-color: grey;");
-                }
-
                 //Add the Slider to the mediaSettingBox
                 mediaSettingHbox.getChildren().add(slider);
 

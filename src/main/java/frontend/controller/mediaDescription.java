@@ -1,5 +1,6 @@
 package frontend.controller;
 
+import backend.MediaFactory.Lame;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,8 +15,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
+import org.farng.mp3.TagException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class mediaDescription {
@@ -25,11 +29,15 @@ public class mediaDescription {
     @FXML
     private TextField textFieldAuthor;
     @FXML
+    public TextField textFieldTitle;
+    @FXML
+    private TextField textFieldAlbum;
+    @FXML
     private AnchorPane mediaDesPane;
     @FXML
     public HBox hBoxListView;
     @FXML
-    private ComboBox pendingState;
+    public ComboBox pendingState;
 
 
     @Getter
@@ -39,8 +47,7 @@ public class mediaDescription {
     public int countingMediaUploads = 0;
     public int contingMediaFiles = 0;
 
-    private ObservableList<String> mediaName = FXCollections.observableArrayList();
-    private ObservableList<Media> mediaItems = FXCollections.observableArrayList();
+    public ObservableList<Lame> lameItems = FXCollections.observableArrayList();
 
     public void initialize() {
         ObservableList<String> options =
@@ -51,34 +58,24 @@ public class mediaDescription {
                         "Publish"
                 );
         pendingState.setItems(options);
+        pendingState.getSelectionModel().select(3);
     }
 
     @FXML
-    public Media btnNewMedia(ActionEvent event) {
+    public Media btnNewMedia(ActionEvent event) throws Exception {
+        //TODO: Multiple Blog Post with always one Media
 
         List<File> list = configureFileChooser();
 
         if (list != null) {
-
             for (File file : list) {
-                contingMediaFiles += 1;
-                Media me = new Media(file.toURI().toString());
-
-                if (!mediaItems.contains(me)) mediaItems.add(me);
-
-                String source = me.getSource();
-                source = source.substring(0, source.lastIndexOf("."));
-                source = source.substring(source.lastIndexOf("/") + 1).replaceAll("%20", " ");
-
-                if (!mediaName.contains(source)) mediaName.add(source);
-
-
+                Lame lame = new Lame(file.toURI().getPath());
+                lame.executeCommand();
+                lameItems.addAll(lame);
             }
-
-            countingMediaUploads += 1;
-
-            controller.showMediaList(mediaItems, mediaName);
+            controller.showMediaList(lameItems);
         }
+
         return null;
     }
 
@@ -90,9 +87,8 @@ public class mediaDescription {
         );
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Media", "*.mp3", "*.mp4"),
-                new FileChooser.ExtensionFilter("MP3", "*.mp3"),
-                new FileChooser.ExtensionFilter("MP4", "*.mp4")
+                new FileChooser.ExtensionFilter("All Media", "*.mp3"),
+                new FileChooser.ExtensionFilter("MP3", "*.mp3")
         );
 
         return fileChooser.showOpenMultipleDialog(new Stage());

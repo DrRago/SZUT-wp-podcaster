@@ -1,6 +1,11 @@
 package frontend.controller;
 
+import backend.MediaFactory.Lame;
 import backend.fileTransfer.Protocols;
+import backend.fileTransfer.Uploader;
+import backend.fileTransfer.UploaderException;
+import backend.fileTransfer.UploaderFactory;
+import backend.wordpress.Blog;
 import config.Config;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,8 +13,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
+import org.farng.mp3.TagException;
 
 import javax.swing.*;
+import java.io.IOException;
 
 public class OptionController {
 
@@ -21,11 +28,11 @@ public class OptionController {
     //Todo: add Port Option
 
     @FXML
-    PasswordField passwdOption; // in config = password
+    public PasswordField passwdOption; // in config = password
     @FXML
-    TextField urlOption; // in config = hostname
+    public TextField urlOption; // in config = hostname
     @FXML
-    TextField usrnameOption; // in config = username
+    public TextField usrnameOption; // in config = username
     @FXML
     TextField uploadpathOption; // in config = workingDir
     @FXML
@@ -50,11 +57,15 @@ public class OptionController {
     TextField mp3_genre; // in config = id3_genre
 
     Config config = new Config();
+
+    public Uploader uploader = null;
+
     /**
      * Initialize the settings window
      * Set default values
      */
     public void initialize(){
+
         bitrateSlider.setValue(32.0);
         // Add a listener to change the label after a value change
         bitrateSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
@@ -66,6 +77,7 @@ public class OptionController {
 
         //Set default values
         //Todo: config.xml
+
     }
 
     /**
@@ -73,7 +85,7 @@ public class OptionController {
      * @param e
      */
     @FXML
-    public void saveOptions(ActionEvent e){
+    public void saveOptions(ActionEvent e) throws IOException {
         config.saveConfig(
                 passwdOption.getText(),
                 urlOption.getText(),
@@ -89,6 +101,15 @@ public class OptionController {
         );
         //Todo: use Config class to save
 
+        try {
+            uploader = UploaderFactory.getUploader((Protocols)protocolOption.getSelectionModel().getSelectedItem(), urlOption.getText(), 990, usrnameOption.getText(), passwdOption.getText(), uploadpathOption.getText());
+            uploader.disconnect();
+        } catch (UploaderException exception) {
+            exception.printStackTrace();
+        }
+        if(uploader==null){
+            //TODO: Exception!!!!!!!
+        }
 
         cancelOptions(e);
     }

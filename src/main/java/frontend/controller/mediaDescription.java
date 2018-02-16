@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -27,6 +28,9 @@ public class mediaDescription {
     private AnchorPane mediaDesPane;
     @FXML
     public HBox hBoxListView;
+    @FXML
+    private ComboBox pendingState;
+
 
     @Getter
     @Setter
@@ -39,6 +43,14 @@ public class mediaDescription {
     private ObservableList<Media> mediaItems = FXCollections.observableArrayList();
 
     public void initialize() {
+        ObservableList<String> options =
+                FXCollections.observableArrayList(
+                        "Draft",
+                        "Pending",
+                        "Private",
+                        "Publish"
+                );
+        pendingState.setItems(options);
     }
 
     @FXML

@@ -1,21 +1,11 @@
 package config;
 
 import backend.fileTransfer.Protocols;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import util.PathUtil;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
+import java.io.*;
+import java.util.Properties;
 
 public class Config {
-
-    private Document doc;
-    private Element eElement;
-    private NodeList nList;
 
     private String hostname;
     private int port;
@@ -29,53 +19,49 @@ public class Config {
     private String id3_year;
     private String id3_comment;
     private String id3_genre;
-    private double mp3_bitrate;
+    private int mp3_bitrate;
+
+    private String configPath;
+    private Properties prop = new Properties();
 
     public Config() {
+        InputStream input;
+        configPath = "config.properties";
         try {
-            File fXmlFile = new File(PathUtil.getResourcePath("config.xml").getPath());
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(fXmlFile);
+            // load a properties file
+            input = new FileInputStream(configPath);
+            prop.load(input);
 
+            // get the property value and print it out
+            hostname = prop.getProperty("hostname", "127.0.0.1");
+            port = Integer.parseInt(prop.getProperty("port", "22"));
+            workingDir = prop.getProperty("workingDir", "/");
+            protocol = Protocols.valueOf(prop.getProperty("protocol", "FTPS"));
+            username = prop.getProperty("username", "username");
+            password = prop.getProperty("password", "password");
 
-            doc.getDocumentElement().normalize();
+            id3_title = prop.getProperty("id3_title", "title");
+            id3_artist = prop.getProperty("id3_artist", "artist");
+            id3_year = prop.getProperty("id3_year", "1337");
+            id3_comment = prop.getProperty("id3_comment", "comment");
+            id3_genre = prop.getProperty("id3_genre", "genre");
+            mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
 
-            nList = doc.getElementsByTagName("config");
-
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    eElement = (Element) nNode;
-
-                    hostname = getElementText("hostname");
-                    port = Integer.parseInt(getElementText("port"));
-                    workingDir = getElementText("workingDir");
-                    protocol = Protocols.valueOf(getElementText("protocol").toUpperCase());
-                    username = getElementText("username");
-                    password = getElementText("password");
-
-                    id3_title = getElementText("id3_title");
-                    id3_artist = getElementText("id3_artist");
-                    id3_year = getElementText("id3_year");
-                    id3_comment = getElementText("id3_comment");
-                    id3_genre = getElementText("id3_genre");
-                    mp3_bitrate = Double.parseDouble(getElementText("mp3_bitrate"));
-                }
-            }
-        } catch (Exception e) {
+            input.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String getElementText(String element) {
-        return eElement.getElementsByTagName(element).item(0).getTextContent();
-    }
-
-    private void setElementText(String element, String text) {
-        eElement.getElementsByTagName(element).item(0).setTextContent(text);
-        //Todo: make it work
+    private void setConfigEntry(String key, String value) {
+        try {
+            OutputStream output = new FileOutputStream(configPath);
+            prop.setProperty(key, value);
+            prop.store(output, null);
+            output.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getHostname() {
@@ -84,7 +70,7 @@ public class Config {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
-        setElementText("hostname", hostname);
+        setConfigEntry("hostname", hostname);
     }
 
     public int getPort() {
@@ -93,7 +79,7 @@ public class Config {
 
     public void setPort(int port) {
         this.port = port;
-        setElementText("port", String.valueOf(port));
+        setConfigEntry("port", String.valueOf(port));
     }
 
     public String getWorkingDir() {
@@ -102,7 +88,7 @@ public class Config {
 
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;
-        setElementText("workingDir", workingDir);
+        setConfigEntry("workingDir", workingDir);
     }
 
     public Protocols getProtocol() {
@@ -111,7 +97,7 @@ public class Config {
 
     public void setProtocol(Protocols protocol) {
         this.protocol = protocol;
-        setElementText("protocol", protocol.toString());
+        setConfigEntry("protocol", protocol.toString());
     }
 
     public String getUsername() {
@@ -120,7 +106,7 @@ public class Config {
 
     public void setUsername(String username) {
         this.username = username;
-        setElementText("username", username);
+        setConfigEntry("username", username);
     }
 
     public String getPassword() {
@@ -129,54 +115,66 @@ public class Config {
 
     public void setPassword(String password) {
         this.password = password;
-        setElementText("password", password);
+        setConfigEntry("password", password);
     }
 
-    public double getBitrate(){ return mp3_bitrate; }
+    public int getBitrate() {
+        return mp3_bitrate;
+    }
 
-    public void setBitrate(double bitrate){
+    public void setBitrate(int bitrate) {
         this.mp3_bitrate = bitrate;
-        setElementText("mp3_bitrate", Double.toString(bitrate));
+        setConfigEntry("mp3_bitrate", Integer.toString(bitrate));
     }
 
-    public String getId3_title() { return id3_title;  }
+    public String getId3_title() {
+        return id3_title;
+    }
 
     public void setId3_title(String id3_title) {
         this.id3_title = id3_title;
-        setElementText("id3_title", id3_title);
+        setConfigEntry("id3_title", id3_title);
     }
 
-    public String getId3_artist() { return id3_artist; }
+    public String getId3_artist() {
+        return id3_artist;
+    }
 
     public void setId3_artist(String id3_artist) {
         this.id3_artist = id3_artist;
-        setElementText("id3_artist", id3_artist);
+        setConfigEntry("id3_artist", id3_artist);
     }
 
-    public String getId3_year() { return id3_year; }
+    public String getId3_year() {
+        return id3_year;
+    }
 
     public void setId3_year(String id3_year) {
         this.id3_year = id3_year;
-        setElementText("id3_year", id3_year);
+        setConfigEntry("id3_year", id3_year);
     }
 
-    public String getId3_comment() { return id3_comment; }
+    public String getId3_comment() {
+        return id3_comment;
+    }
 
     public void setId3_comment(String id3_comment) {
         this.id3_comment = id3_comment;
-        setElementText("id3_comment", id3_comment);
+        setConfigEntry("id3_comment", id3_comment);
     }
 
-    public String getId3_genre() { return id3_genre; }
+    public String getId3_genre() {
+        return id3_genre;
+    }
 
     public void setId3_genre(String id3_genre) {
         this.id3_genre = id3_genre;
-        setElementText("id3_genre", id3_genre);
+        setConfigEntry("id3_genre", id3_genre);
     }
 
     public void saveConfig(String password, String hostname, String username, String workingDir,
-                                  Protocols protocol , double mp3_bitrate, String id3_title, String id3_artist,
-                                  String id3_year, String id3_comment, String id3_genre) {
+                           Protocols protocol, int mp3_bitrate, String id3_title, String id3_artist,
+                           String id3_year, String id3_comment, String id3_genre) {
         this.setPassword(password);
         this.setHostname(hostname);
         this.setUsername(username);

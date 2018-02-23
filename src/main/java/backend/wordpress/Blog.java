@@ -34,7 +34,7 @@ public class Blog {
         addPost(title, "publish", encoder);
     }
 
-    public void addPost(String title, String status, Lame encoder) throws InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException, SftpException, IOException {
+    public void addPost(String title, String status, Lame encoder) throws InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException, IOException {
         LOGGER.info(String.format("adding post %s as %s", title, status));
         File file = encoder.getMP3File();
         String uploadStatus = uploader.uploadFile(file.getPath());

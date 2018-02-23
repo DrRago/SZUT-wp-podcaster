@@ -35,10 +35,14 @@ public class SFTPUploader implements Uploader {
         }
     }
 
-    public String uploadFile(String filePath) throws FileNotFoundException, SftpException {
+    public String uploadFile(String filePath) throws FileNotFoundException, UploaderException {
         LOGGER.info(String.format("uploading file \"%s\" to %s", filePath, session.getHost()));
         File f = new File(filePath);
-        sftpChannel.put(new FileInputStream(f), f.getName());
+        try {
+            sftpChannel.put(new FileInputStream(f), f.getName());
+        } catch (SftpException e) {
+            throw new UploaderException(e);
+        }
         LOGGER.info("upload successful");
         return "200";
     }

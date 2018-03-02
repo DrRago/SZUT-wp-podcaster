@@ -14,9 +14,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -24,7 +26,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
+import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import lombok.Setter;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
 import net.bican.wordpress.exceptions.InvalidArgumentsException;
@@ -32,6 +36,7 @@ import net.bican.wordpress.exceptions.ObjectNotFoundException;
 import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -52,11 +57,11 @@ public class PodcastController {
     @FXML
     private HBox hboxMain;
 
-    private MediaPlayer player;
+    public MediaPlayer player;
 
     private AnchorPane box;
 
-    private mediaDescription mediaDescriptioncontroller;
+    public mediaDescription mediaDescriptioncontroller;
     private OptionController optionController;
 
     private ListView<Lame> itemList = new ListView<>();
@@ -76,6 +81,33 @@ public class PodcastController {
                 openMediaView(mediaDescriptioncontroller.lameItems, new Media(newValue.getMP3File().toURI().toString()));
             }
         });
+
+
+        itemList.setCellFactory(lv -> {
+            TextFieldListCell<Lame> cell = new TextFieldListCell<>();
+            cell.setConverter(new ListViewConverter(cell));
+            return cell ;
+        });
+    }
+
+    //Convert the Object name to the Title of the Media
+    public static class ListViewConverter extends StringConverter<Lame>{
+        private final ListCell<Lame> cell;
+        public ListViewConverter(TextFieldListCell<Lame> cell) {
+            this.cell = cell;
+        }
+
+        @Override
+        public String toString(Lame object) {
+            return object.getID3_Title();
+        }
+
+        @Override
+        public Lame fromString(String string) {
+            Lame lame = cell.getItem();
+            lame.setID3_Title(string);
+            return null;
+        }
     }
 
     public void btnAccept(ActionEvent event) throws IOException, SftpException, XmlRpcFault, ObjectNotFoundException, UploaderException, InvalidArgumentsException, InsufficientRightsException {
@@ -89,7 +121,7 @@ public class PodcastController {
     }
 
     public void btnCancel(ActionEvent event) {
-        player.stop();
+        //player.stop();
         controller.closePodcast();
     }
 
@@ -107,6 +139,7 @@ public class PodcastController {
             openMediaView(items, new Media(items.get(0).getMP3File().toURI().toString()));
             for(int i = 0; i<items.size(); i++){
                 itemList.getItems().addAll(items.get(i));
+                String songTitle = itemList.getItems().get(i).getID3_Title();
             }
 
     }

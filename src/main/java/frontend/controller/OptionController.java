@@ -79,6 +79,10 @@ public class OptionController {
 
         protocolOption.getItems().addAll(Protocols.FTPS, Protocols.SFTP);
         protocolOption.getSelectionModel().select(0);
+
+        //Set default values
+        //Todo: config.xml
+
     }
 
     /**
@@ -86,8 +90,9 @@ public class OptionController {
      * @param e
      */
     @FXML
-    public void saveOptions(ActionEvent e) throws IOException {
-
+    public void saveOptions(ActionEvent e) throws IOException, UploaderException {
+//        if(MainController.uploader != UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir())) MainController.uploader.disconnect();
+        if(MainController.uploader != null)MainController.uploader.disconnect();
         config.saveConfig(
                 passwdOption.getText(),
                 urlOption.getText(),
@@ -102,12 +107,12 @@ public class OptionController {
                 mp3_genre.getText()
         );
 
-        // Initialize an uploader
+        cancelOptions(e);
+
         try {
-            uploader = UploaderFactory.getUploader((Protocols)protocolOption.getSelectionModel().getSelectedItem(), urlOption.getText(), 990, usrnameOption.getText(), passwdOption.getText(), uploadpathOption.getText());
-            //uploader.disconnect();
+            Uploader newConfigUploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
-            //exception.printStackTrace();
+            exception.printStackTrace();
         }
         if(uploader==null){
             //TODO: Exception!!!!!!!

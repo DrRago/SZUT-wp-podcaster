@@ -1,13 +1,8 @@
 package frontend.controller;
 
-import backend.MediaFactory.Lame;
-import backend.fileTransfer.UploaderException;
-import backend.wordpress.Blog;
-import backend.wordpress.MyPost;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -31,14 +26,19 @@ public class MainController {
 
     @FXML
     public TableView tableView;
+
     @FXML
     private VBox VBoxEdt;
+
     @FXML
     private AnchorPane EditPane;
+
     @FXML
     private Label statusTypeLabel;
+
     @FXML
     public HBox mainHbox;
+
     @FXML
     private ProgressBar statusbar;
 
@@ -50,10 +50,14 @@ public class MainController {
     // Object to interact wiht for data
     private InformationController controller = null;
 
+    private Config config = new Config();
+
     // Initialize windows for easy access
     public static Stage stagePodcast = new Stage();
-    private Stage stageSettings = new Stage();
+    public static Stage stageSettings = new Stage();
     private Stage stageHelp = new Stage();
+
+    public static Uploader uploader;
 
     private ObservableList tableData = FXCollections.observableArrayList();
 
@@ -99,6 +103,33 @@ public class MainController {
 
         //Todo: Posts
 
+        System.out.println(config.getProtocol());
+        System.out.println(config.getHostname());
+        System.out.println(config.getPort());
+        System.out.println(config.getUsername());
+        System.out.println(config.getPassword());
+        System.out.println(config.getWorkingDir());
+
+        //config.setUsername("root");
+        //config.setPassword("12345");
+
+        try {
+            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
+        } catch (UploaderException exception) {
+            //exception.printStackTrace();
+            Alert login = new Alert(Alert.AlertType.INFORMATION, "Can't Login to the Server. Please configure the connection!");
+            login.setTitle("Can't Login");
+            login.showAndWait();
+            openSetting();
+        }
+    }
+
+    public static void shutdown() {
+        try {
+            uploader.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -185,6 +216,7 @@ public class MainController {
             e.printStackTrace();
         }
         PodcastController controller = fxmlLoader.getController();
+        //TODO: WARUM WIRD DAS ROT MAKIERT???? XD
         controller.setController(this);
         controller.init();
         stagePodcast.setTitle("New Podcast");

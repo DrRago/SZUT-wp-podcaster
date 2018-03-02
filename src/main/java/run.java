@@ -23,7 +23,7 @@ public class run {
         try {
             Uploader uploader = UploaderFactory.getUploader(Protocols.FTPS, "localhost", 990, "root", "12345", "/uploads/");
 
-            Lame lame = new Lame("C:\\Users\\Leonhard.Gahr\\Downloads\\SFGrenade - Rhythm of the Dancefloor.mp3");
+            Lame lame = new Lame("C:/Users/Marius/12_fabian_roemer_-_das_beste_kommt_noch.mp3");
             lame.executeCommand();
 
             //Blog blog = new Blog("admin", "12345", "http://localhost/wp/xmlRpc.php", uploader);

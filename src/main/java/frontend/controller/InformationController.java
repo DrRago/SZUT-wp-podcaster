@@ -21,28 +21,38 @@ public class InformationController {
 
     @FXML
     public Label titleLabel;
+
     @FXML
     public VBox vboxInfo;
+
     @FXML
     private VBox vboxList;
+
     @FXML
     public AnchorPane informationPane;
 
     @FXML
     private TextField titleTextField;
+
     @FXML
     private TextField authorTextField;
+
     @FXML
     private TextField albumTextField;
+
     @FXML
     private TextField yearTextField;
+
     @FXML
     private TextField genreTextField;
+
     @FXML
     private TextArea commentTextField;
 
     @FXML
     private ListView<?> titleListView;
+
+
 
     public void initialize() {
     }

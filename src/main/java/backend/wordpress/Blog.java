@@ -10,11 +10,14 @@ import net.bican.wordpress.Wordpress;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
 import net.bican.wordpress.exceptions.InvalidArgumentsException;
 import net.bican.wordpress.exceptions.ObjectNotFoundException;
+import org.jsoup.Jsoup;
 import redstone.xmlrpc.XmlRpcFault;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Blog {
@@ -28,6 +31,21 @@ public class Blog {
         this.remotePath = new URL(remotePath);
         wp = new Wordpress(wp_user, wp_password, xmlRpcUrl);
         this.uploader = uploader;
+    }
+
+    public List<MyPost> getPosts() throws XmlRpcFault, InsufficientRightsException, ObjectNotFoundException {
+        List<Post> postList = wp.getPosts();
+        List<MyPost> posts = new ArrayList<>();
+        for (Post post : postList) {
+            posts.add(new MyPost(post.getPost_id(), post.getPost_title(), wp.getUser(post.getPost_author()).getNickname()));
+        }
+        return posts;
+    }
+
+    public Lame editDownload(int postID) throws XmlRpcFault, ObjectNotFoundException, InsufficientRightsException {
+        Post post = wp.getPost(postID);
+        System.out.println(Jsoup.parse(post.getPost_content()).attr("href"));
+        return null;
     }
 
     public void addPost(String title, Lame encoder) throws SftpException, XmlRpcFault, IOException, ObjectNotFoundException, UploaderException, InvalidArgumentsException, InsufficientRightsException {

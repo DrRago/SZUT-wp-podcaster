@@ -3,10 +3,7 @@ package backend.fileTransfer;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPSClient;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
@@ -23,7 +20,7 @@ public class FTPSUploader implements Uploader {
             client.login(username, password);
             if (client.getReplyCode() != 230) {
                 LOGGER.severe(client.getReplyString().trim());
-                throw new UploaderException(client.getReplyString());
+                throw new UploaderException(client.getReplyString().trim());
             } else {
                 LOGGER.info(client.getReplyString().trim());
             }
@@ -62,6 +59,24 @@ public class FTPSUploader implements Uploader {
         }
         LOGGER.info(client.getReplyString().trim());
         return client.getReplyString().trim();
+    }
+
+    @Override
+    public void downloadFile(String remoteFile, String localPath) throws UploaderException {
+        remoteFile = Paths.get(remote, remoteFile).toString();
+        LOGGER.info(String.format("Starting download of \"%s\" to \"%s\"", remoteFile, localPath));
+        try {
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localPath));
+            client.retrieveFile(remoteFile, outputStream);
+            if (client.getReplyCode() != 226) {
+                LOGGER.severe(client.getReplyString().trim());
+                throw new UploaderException(client.getReplyString().trim());
+            }
+            outputStream.close();
+            LOGGER.info(String.format("Action completed with success code %d: file stored to %s", client.getReplyCode(), localPath));
+        } catch (IOException e) {
+            throw new UploaderException(e);
+        }
     }
 
     @Override

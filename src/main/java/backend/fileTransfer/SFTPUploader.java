@@ -47,6 +47,11 @@ public class SFTPUploader implements Uploader {
         return "200";
     }
 
+    @Override
+    public void downloadFile(String remoteFile, String localPath) throws UploaderException {
+        // TODO: 02/03/2018 add download
+    }
+
     private void setRemotePath(String path) throws SftpException {
         sftpChannel.cd(path);
         LOGGER.info(String.format("remote path set to \"%s\"", path));

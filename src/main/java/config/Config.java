@@ -34,7 +34,7 @@ public class Config {
 
             // get the property value and print it out
             hostname = prop.getProperty("hostname", "127.0.0.1");
-            port = Integer.parseInt(prop.getProperty("port", "22"));
+            port = Integer.parseInt(prop.getProperty("port", "990"));
             workingDir = prop.getProperty("workingDir", "/");
             protocol = Protocols.valueOf(prop.getProperty("protocol", "FTPS"));
             username = prop.getProperty("username", "username");

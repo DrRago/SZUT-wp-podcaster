@@ -54,6 +54,9 @@ public class Config {
     }
 
     private void setConfigEntry(String key, String value) {
+        if (value.isEmpty()) {
+            return;
+        }
         try {
             OutputStream output = new FileOutputStream(configPath);
             prop.setProperty(key, value);

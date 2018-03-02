@@ -1,8 +1,13 @@
 package frontend.controller;
 
+import backend.MediaFactory.Lame;
+import backend.fileTransfer.UploaderException;
+import backend.wordpress.Blog;
+import backend.wordpress.MyPost;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -10,33 +15,37 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import net.bican.wordpress.exceptions.InsufficientRightsException;
+import net.bican.wordpress.exceptions.ObjectNotFoundException;
+import org.farng.mp3.TagException;
+import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainController {
 
     @FXML
     public TableView tableView;
-
     @FXML
     private VBox VBoxEdt;
-
     @FXML
     private AnchorPane EditPane;
-
     @FXML
     private Label statusTypeLabel;
-
     @FXML
     public HBox mainHbox;
-
     @FXML
     private ProgressBar statusbar;
 
     private Region pane;
+    private Blog blog;
+
+
 
     // Object to interact wiht for data
     private InformationController controller = null;
@@ -53,7 +62,7 @@ public class MainController {
      * Set a status bar for progress on upload
      * Load default images
      */
-    public void initialize() {
+    public void initialize() throws Exception {
         statusbar.setProgress(0.0);
         try {
             loadPane();
@@ -66,6 +75,30 @@ public class MainController {
         stagePodcast.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
         stageHelp.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
         stageSettings.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
+
+        tableView.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.isPrimaryButtonDown() && event.getClickCount() == 2){
+                    Lame post = null;
+                    try {
+                        post = blog.editDownload(((MyPost) tableView.getSelectionModel().getSelectedItem()).getPostID());
+                    } catch (XmlRpcFault | ObjectNotFoundException | InsufficientRightsException | IOException | UploaderException | TagException e) {
+                        e.printStackTrace();
+                    }
+                    menuEdit(event);
+                    controller.setTitle(post.getID3_Title());
+                    controller.setAlbum(post.getID3_Album());
+                    controller.setAuthor(post.getID3_Artist());
+                    controller.setComment(post.getID3_Comment());
+                    controller.setGenre(post.getID3_Genre());
+                    controller.setYear(post.getID3_ReleaseYear());
+                }
+            }
+        });
+
+        //Todo: Posts
+
     }
 
     /**
@@ -107,7 +140,7 @@ public class MainController {
      * @param event
      */
     @FXML
-    void menuEdit(ActionEvent event){btnEdit(event);}
+    void menuEdit(MouseEvent event){btnEdit(event);}
 
     /**
      * Open a Help-Window
@@ -152,7 +185,6 @@ public class MainController {
             e.printStackTrace();
         }
         PodcastController controller = fxmlLoader.getController();
-        //TODO: WARUM WIRD DAS ROT MAKIERT???? XD
         controller.setController(this);
         controller.init();
         stagePodcast.setTitle("New Podcast");
@@ -168,7 +200,7 @@ public class MainController {
      * @param event
      */
     @FXML
-    void btnEdit(ActionEvent event) {
+    void btnEdit(MouseEvent event) {
         //if(tableView.getSelectionModel().getSelectedItems() != null && !pane.isVisible()) {
         if(!pane.isVisible())openPane();
                 //TODO: Listing
@@ -193,6 +225,12 @@ public class MainController {
         */
 
     }
+
+
+    void updatePosts(List<MyPost> posts){
+        tableView.setItems((ObservableList) posts);
+    }
+
 
     /**
      * Main method to initialize and open the settings window

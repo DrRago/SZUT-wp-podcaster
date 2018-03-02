@@ -81,11 +81,11 @@ public class PodcastController {
     public void btnAccept(ActionEvent event) throws IOException, SftpException, XmlRpcFault, ObjectNotFoundException, UploaderException, InvalidArgumentsException, InsufficientRightsException {
         if(player!=null)player.stop();
         controller.closePodcast();
-        Blog blog = new Blog(optionController.usrnameOption.getText(), optionController.passwdOption.getText(), "http://localhost/wp/xmlRpc.php" , optionController.uploader);
+        //Blog blog = new Blog(optionController.usrnameOption.getText(), optionController.passwdOption.getText(), "http://localhost/wp/xmlRpc.php" , optionController.uploader);
         ObservableList<Lame> lameItems = mediaDescriptioncontroller.lameItems;
-        for(int i = 0; lameItems.size()>i; i++){
-            blog.addPost(lameItems.get(i).getID3_Title(),mediaDescriptioncontroller.pendingState.getSelectionModel().toString() , optionController.uploadpathOption.getText(), lameItems.get(i));
-        }
+        //for(int i = 0; lameItems.size()>i; i++){
+        //    blog.addPost(lameItems.get(i).getID3_Title(),mediaDescriptioncontroller.pendingState.getSelectionModel().toString() , optionController.uploadpathOption.getText(), lameItems.get(i));
+        //}
     }
 
     public void btnCancel(ActionEvent event) {

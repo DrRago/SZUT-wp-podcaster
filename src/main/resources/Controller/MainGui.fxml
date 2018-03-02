@@ -95,6 +95,8 @@
                         </Button>
                         <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                             <columns>
+                                <TableColumn prefWidth="75.0" text="ID">
+                                </TableColumn>
                                 <TableColumn prefWidth="75.0" text="Title">
                                 </TableColumn>
                                 <TableColumn prefWidth="75.0" text="Author">

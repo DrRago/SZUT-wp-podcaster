@@ -6,7 +6,9 @@ import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
+import backend.wordpress.MyPost;
 import config.Config;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,6 +19,9 @@ import org.farng.mp3.TagException;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class OptionController {
 
@@ -74,10 +79,6 @@ public class OptionController {
 
         protocolOption.getItems().addAll(Protocols.FTPS, Protocols.SFTP);
         protocolOption.getSelectionModel().select(0);
-
-        //Set default values
-        //Todo: config.xml
-
     }
 
     /**
@@ -86,30 +87,39 @@ public class OptionController {
      */
     @FXML
     public void saveOptions(ActionEvent e) throws IOException {
+
         config.saveConfig(
                 passwdOption.getText(),
                 urlOption.getText(),
                 usrnameOption.getText(),
                 uploadpathOption.getText(),
                 (Protocols) protocolOption.getSelectionModel().getSelectedItem(),
-                bitrateSlider.getValue(),
+                (int) bitrateSlider.getValue(),
                 mp3_title.getText(),
                 mp3_artist.getText(),
                 mp3_year.getText(),
                 mp3_comment.getText(),
                 mp3_genre.getText()
         );
-        //Todo: use Config class to save
 
+        // Initialize an uploader
         try {
             uploader = UploaderFactory.getUploader((Protocols)protocolOption.getSelectionModel().getSelectedItem(), urlOption.getText(), 990, usrnameOption.getText(), passwdOption.getText(), uploadpathOption.getText());
-            uploader.disconnect();
+            //uploader.disconnect();
         } catch (UploaderException exception) {
-            exception.printStackTrace();
+            //exception.printStackTrace();
         }
         if(uploader==null){
             //TODO: Exception!!!!!!!
         }
+
+        // Initialize a blog to get posts for MainGui
+        try {
+            Blog blog = new Blog(usrnameOption.getText(), passwdOption.getText(), urlOption.getText(), uploader, uploadpathOption.getText());
+            controller.updatePosts(blog.getPosts());
+        } catch (Exception exception){}
+
+
 
         cancelOptions(e);
     }

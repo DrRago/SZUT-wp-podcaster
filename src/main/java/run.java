@@ -26,8 +26,8 @@ public class run {
             Lame lame = new Lame("C:\\Users\\Leonhard.Gahr\\Downloads\\SFGrenade - Rhythm of the Dancefloor.mp3");
             lame.executeCommand();
 
-            Blog blog = new Blog("admin", "12345", "http://localhost/wp/xmlRpc.php", uploader);
-            blog.addPost("Test", "publish", "http://localhost/uploads/", lame);
+            //Blog blog = new Blog("admin", "12345", "http://localhost/wp/xmlRpc.php", uploader);
+            //blog.addPost("Test", "publish", "http://localhost/uploads/", lame);
             uploader.disconnect();
         } catch (Throwable e) {
             e.printStackTrace();

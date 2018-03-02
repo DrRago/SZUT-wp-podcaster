@@ -25,9 +25,7 @@
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#menuNew" text="New" />
-                        <MenuItem mnemonicParsing="false" text="Open…" />
-                        <Menu mnemonicParsing="false" text="Open Recent" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuNew" text="New Podcast" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#menuSettings" text="Options">
                             <graphic>
@@ -45,22 +43,8 @@
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
                         <MenuItem mnemonicParsing="false" text="Select All">
-                            <graphic>
-                                <ImageView fitHeight="20.0" fitWidth="20.0">
-                                    <image>
-                                        <Image url="@../icons/select-icon.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
                         </MenuItem>
                         <MenuItem mnemonicParsing="false" text="Deselect All">
-                            <graphic>
-                                <ImageView fitHeight="20.0" fitWidth="20.0">
-                                    <image>
-                                        <Image url="@../icons/deselect-icon.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#menuEdit" text="Edit">
@@ -85,13 +69,6 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <MenuItem mnemonicParsing="false" onAction="#menuHelp" text="Help">
-                        <graphic>
-                            <ImageView fitHeight="20.0" fitWidth="20.0">
-                                <image>
-                                    <Image url="@../icons/help-icon.png" />
-                                </image>
-                            </ImageView>
-                        </graphic>
                     </MenuItem>
                 </Menu>
             </menus>
@@ -119,22 +96,8 @@
                         <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn prefWidth="75.0" text="Title">
-                                    <graphic>
-                                        <ImageView fitHeight="20.0" fitWidth="20.0">
-                                            <image>
-                                                <Image url="@../icons/title-icon.png" />
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
                                 </TableColumn>
                                 <TableColumn prefWidth="75.0" text="Author">
-                                <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0">
-                                        <image>
-                                            <Image url="@../icons/author-icon.png" />
-                                        </image>
-                                    </ImageView>
-                                </graphic>
                                 </TableColumn>
                             </columns>
                             <columnResizePolicy>

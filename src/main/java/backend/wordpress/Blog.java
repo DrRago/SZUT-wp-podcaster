@@ -53,7 +53,11 @@ public class Blog {
         if (!directory.exists()) directory.mkdir();
 
         String localFilename = Paths.get("blogfiles", remoteFilename).toString();
-        uploader.downloadFile(remoteFilename, localFilename);
+        if (new File(localFilename).exists()) {
+            LOGGER.info(String.format("File \"%s\" already downloaded, skipping file..", localFilename));
+        } else {
+            uploader.downloadFile(remoteFilename, localFilename);
+        }
         return new Lame(localFilename);
     }
 

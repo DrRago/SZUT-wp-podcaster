@@ -67,6 +67,7 @@ public class Lame {
                 throw new RuntimeException("command 'lame' not found. Please install lame (e.g. sudo apt-get install lame)");
             }
         }
+        LOGGER.info(String.format("Lame found for machine (%s)", System.getProperty("os.name")));
     }
 
     public void executeCommand() throws Exception {
@@ -90,7 +91,7 @@ public class Lame {
             commandList.addAll(Arrays.asList("--tg", "\"" + getID3_Genre() + "\""));
             commandList.addAll(Arrays.asList("-m", audioMode.getParam()));
             commandList.add("--add-id3v2");
-            commandList.add("--silent");
+            commandList.add("--silent -q 0");
             commandList.add("\"" + newSource + "\"");
             commandList.add("\"" + destPath + "\"");
 

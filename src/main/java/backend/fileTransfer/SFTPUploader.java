@@ -49,7 +49,14 @@ public class SFTPUploader implements Uploader {
 
     @Override
     public void downloadFile(String remoteFile, String localPath) throws UploaderException {
-        // TODO: 02/03/2018 add download
+        LOGGER.info(String.format("downloading file \"%s\" to \"%s\"", remoteFile, localPath));
+        try {
+            sftpChannel.get(remoteFile, localPath);
+            LOGGER.info("download complete successfully");
+        } catch (SftpException e) {
+            LOGGER.severe(e.getMessage());
+            throw new UploaderException(e);
+        }
     }
 
     private void setRemotePath(String path) throws SftpException {

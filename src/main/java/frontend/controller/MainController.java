@@ -1,8 +1,16 @@
 package frontend.controller;
 
+import backend.MediaFactory.Lame;
+import backend.fileTransfer.Uploader;
+import backend.fileTransfer.UploaderException;
+import backend.fileTransfer.UploaderFactory;
+import backend.wordpress.Blog;
+import backend.wordpress.MyPost;
+import config.Config;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;

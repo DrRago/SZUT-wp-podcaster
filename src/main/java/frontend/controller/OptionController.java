@@ -99,6 +99,7 @@ public class OptionController {
                 usrnameOption.getText(),
                 uploadpathOption.getText(),
                 (Protocols) protocolOption.getSelectionModel().getSelectedItem(),
+                urlOption.getText(),
                 (int) bitrateSlider.getValue(),
                 mp3_title.getText(),
                 mp3_artist.getText(),
@@ -110,7 +111,7 @@ public class OptionController {
         cancelOptions(e);
 
         try {
-            Uploader newConfigUploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
+            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
             exception.printStackTrace();
         }
@@ -127,6 +128,10 @@ public class OptionController {
 
 
         cancelOptions(e);
+    }
+
+    public Uploader getUploader() {
+        return uploader;
     }
 
     @FXML

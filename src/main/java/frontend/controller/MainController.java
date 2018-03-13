@@ -3,7 +3,6 @@ package frontend.controller;
 import backend.MediaFactory.Lame;
 import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
-import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
@@ -21,6 +20,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import lombok.Setter;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
 import net.bican.wordpress.exceptions.ObjectNotFoundException;
 import org.farng.mp3.TagException;
@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.util.List;
 
 public class MainController {
+
+    @Setter
+    private InformationController controller;
 
     @FXML
     public TableView tableView;
@@ -50,13 +53,16 @@ public class MainController {
     @FXML
     private ProgressBar statusbar;
 
+    @FXML
+    public static Button btnAddNew;
+
     private Region pane;
     private Blog blog;
 
 
 
     // Object to interact wiht for data
-    private InformationController controller = null;
+    private InformationController infocontroller = null;
 
     private Config config = new Config();
 
@@ -68,6 +74,7 @@ public class MainController {
     public static Uploader uploader;
 
     private ObservableList tableData = FXCollections.observableArrayList();
+    private static Stage stageLogin = new Stage();
 
     /**
      * Initialize the main window
@@ -99,12 +106,12 @@ public class MainController {
                         e.printStackTrace();
                     }
                     menuEdit(event);
-                    controller.setTitle(post.getID3_Title());
-                    controller.setAlbum(post.getID3_Album());
-                    controller.setAuthor(post.getID3_Artist());
-                    controller.setComment(post.getID3_Comment());
-                    controller.setGenre(post.getID3_Genre());
-                    controller.setYear(post.getID3_ReleaseYear());
+                    infocontroller.setTitle(post.getID3_Title());
+                    infocontroller.setAlbum(post.getID3_Album());
+                    infocontroller.setAuthor(post.getID3_Artist());
+                    infocontroller.setComment(post.getID3_Comment());
+                    infocontroller.setGenre(post.getID3_Genre());
+                    infocontroller.setYear(post.getID3_ReleaseYear());
                 }
             }
         });
@@ -118,18 +125,42 @@ public class MainController {
         System.out.println(config.getPassword());
         System.out.println(config.getWorkingDir());
 
-        //config.setUsername("root");
-        //config.setPassword("12345");
-
-        try {
+        /*try {
             uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
             //exception.printStackTrace();
-            Alert login = new Alert(Alert.AlertType.INFORMATION, "Can't Login to the Server. Please configure the connection!");
+           Alert login = new Alert(Alert.AlertType.INFORMATION, "Can't Login to the URL. Check the configuration, your Username and Password.\n Please try again!");
             login.setTitle("Can't Login");
             login.showAndWait();
-            openSetting();
+            Stage stage = (Stage) tableView.getScene().getWindow();
+            stage.addEventHandler(WindowEvent.WINDOW_SHOWING, new  EventHandler<WindowEvent>()
+            {
+                @Override
+                public void handle(WindowEvent window)
+                {
+                    stage.close();
+                    openLogin();
+                }
+            });
+
+        }*/
+        //Stage stageMain = (Stage) btnAddNew.getScene().getWindow();
+        //stageMain.hide();
+        openLogin();
+    }
+
+    public void openLogin(){
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/OldLogin.fxml"));
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        stageLogin.setTitle("Login");
+        stageLogin.setScene(new Scene(root));
+
+        stageLogin.show();
     }
 
     public static void shutdown() {
@@ -194,7 +225,7 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //HelpController controller = fxmlLoader.getController();
+        //HelpController infocontroller = fxmlLoader.getController();
         stageHelp.setTitle("Help");
         stageHelp.setScene(new Scene(root));
 
@@ -267,7 +298,7 @@ public class MainController {
     }
 
 
-    void updatePosts(List<MyPost> posts){
+    public void updatePosts(List<MyPost> posts){
         tableView.setItems((ObservableList) posts);
     }
 
@@ -298,8 +329,8 @@ public class MainController {
 
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
         pane = fxmlLoader.load();
-        controller = fxmlLoader.getController();
-        controller.setController(this);
+        infocontroller = fxmlLoader.getController();
+        infocontroller.setController(this);
         // Create new Anchor Pane for the SidePane
 
         //EditPane.setMaxWidth(pane.getMaxWidth());

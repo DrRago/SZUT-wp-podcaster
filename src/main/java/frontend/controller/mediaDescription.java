@@ -30,13 +30,13 @@ import java.util.Set;
 public class mediaDescription {
 
     @FXML
-    private TextArea textAreaDescrption;
+    public TextArea textAreaDescrption;
     @FXML
-    private TextField textFieldAuthor;
+    public TextField textFieldAuthor;
     @FXML
     public TextField textFieldTitle;
     @FXML
-    private TextField textFieldAlbum;
+    public TextField textFieldAlbum;
     @FXML
     private AnchorPane mediaDesPane;
     @FXML

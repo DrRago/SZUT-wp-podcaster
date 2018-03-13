@@ -5,6 +5,7 @@ import backend.MediaFactory.Lame;
 import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
 import com.jcraft.jsch.SftpException;
+import config.Config;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -66,6 +67,7 @@ public class PodcastController {
 
     private ListView<Lame> itemList = new ListView<>();
     private MediaView mv;
+    private Config config = new Config();
 
     public void init() {
         try {
@@ -113,15 +115,21 @@ public class PodcastController {
     public void btnAccept(ActionEvent event) throws IOException, SftpException, XmlRpcFault, ObjectNotFoundException, UploaderException, InvalidArgumentsException, InsufficientRightsException {
         if(player!=null)player.stop();
         controller.closePodcast();
-        //Blog blog = new Blog(optionController.usrnameOption.getText(), optionController.passwdOption.getText(), "http://localhost/wp/xmlRpc.php" , optionController.uploader);
+
+        System.out.println(optionController.getUploader());
+        Blog blog = new Blog(config.getUsername(), config.getPassword(), config.getHostname() , optionController.getUploader(), config.getWorkingDir());
+
         ObservableList<Lame> lameItems = mediaDescriptioncontroller.lameItems;
-        //for(int i = 0; lameItems.size()>i; i++){
-        //    blog.addPost(lameItems.get(i).getID3_Title(),mediaDescriptioncontroller.pendingState.getSelectionModel().toString() , optionController.uploadpathOption.getText(), lameItems.get(i));
-        //}
+        for(int i = 0; lameItems.size()>i; i++){
+            lameItems.get(i).setID3_Title(mediaDescriptioncontroller.textFieldTitle.getText());
+            lameItems.get(i).setID3_Artist(mediaDescriptioncontroller.textFieldAuthor.getText());
+            lameItems.get(i).setID3_Album(mediaDescriptioncontroller.textFieldAlbum.getText());
+            blog.addPost(mediaDescriptioncontroller.textFieldTitle.getText(), mediaDescriptioncontroller.pendingState.getSelectionModel().toString(), mediaDescriptioncontroller.lameItems.get(i));
+        }
     }
 
     public void btnCancel(ActionEvent event) {
-        //player.stop();
+        if(player!=null)player.stop();
         controller.closePodcast();
     }
 

@@ -21,6 +21,8 @@ public class Config {
     private String id3_genre;
     private int mp3_bitrate;
 
+    private String wordpressURL;
+
     private String configPath;
     private Properties prop = new Properties();
 
@@ -46,6 +48,8 @@ public class Config {
             id3_comment = prop.getProperty("id3_comment", "comment");
             id3_genre = prop.getProperty("id3_genre", "genre");
             mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
+
+            wordpressURL = prop.getProperty("wordpressURL", "localhost/wordpress");
 
             input.close();
         } catch (IOException e) {
@@ -83,6 +87,15 @@ public class Config {
     public void setPort(int port) {
         this.port = port;
         setConfigEntry("port", String.valueOf(port));
+    }
+
+    public void setWordpressURL(String wordpressURL){
+        this.wordpressURL = wordpressURL;
+        setConfigEntry("wordpressURL", String.valueOf(wordpressURL));
+    }
+
+    public String getWordpressURL(){
+        return wordpressURL;
     }
 
     public String getWorkingDir() {
@@ -176,13 +189,14 @@ public class Config {
     }
 
     public void saveConfig(String password, String hostname, String username, String workingDir,
-                           Protocols protocol, int mp3_bitrate, String id3_title, String id3_artist,
+                           Protocols protocol, String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
                            String id3_year, String id3_comment, String id3_genre) {
         this.setPassword(password);
         this.setHostname(hostname);
         this.setUsername(username);
         this.setWorkingDir(workingDir);
         this.setProtocol(protocol);
+        this.setWordpressURL(wordpressURL);
         this.setBitrate(mp3_bitrate);
         this.setId3_title(id3_title);
         this.setId3_artist(id3_artist);

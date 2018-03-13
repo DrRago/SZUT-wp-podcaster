@@ -71,12 +71,10 @@ public class Lame {
     }
 
     public void executeCommand() throws Exception {
-        Path destPath = ID3TagUtil.getFile().toPath();
-        Path newSource = destPath.resolveSibling(ID3TagUtil.getFile().getName() + ".old");
-        LOGGER.info(String.format("encoding file %s", destPath));
+        Path source = ID3TagUtil.getFile().toPath();
+        Path temp = source.resolveSibling(ID3TagUtil.getFile().getName() + ".temp");
 
-        LOGGER.info(String.format("moving file %s", destPath));
-        Files.move(destPath, newSource);
+        LOGGER.info(String.format("encoding file %s", source));
         try {
             List<String> commandList = new ArrayList<>();
 
@@ -91,9 +89,9 @@ public class Lame {
             commandList.addAll(Arrays.asList("--tg", "\"" + getID3_Genre() + "\""));
             commandList.addAll(Arrays.asList("-m", audioMode.getParam()));
             commandList.add("--add-id3v2");
-            commandList.add("--silent -q 0");
-            commandList.add("\"" + newSource + "\"");
-            commandList.add("\"" + destPath + "\"");
+            commandList.addAll(Arrays.asList("--silent", "-q", "0"));
+            commandList.add("\"" + source + "\"");
+            commandList.add("\"" + temp + "\"");
 
             LOGGER.info(String.format("executing command %s", StringUtils.join(commandList, " ")));
 
@@ -114,17 +112,17 @@ public class Lame {
                 LOGGER.severe("encoding failed");
                 throw new EncodingAlgorithmException(builder.toString());
             }
-
-            LOGGER.info(String.format("deleting %s", newSource));
-
-            Files.delete(newSource);
+            LOGGER.info(String.format("backing up %s", source));
+            Files.move(source, source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"));
+            LOGGER.info(String.format("writing file %s", source));
+            Files.move(temp, source);
         } catch (Throwable e) {
+            e.printStackTrace();
             LOGGER.severe("unexpected failure");
-            Files.delete(destPath);
-            Files.move(newSource, destPath);
+            Files.delete(temp);
             throw new Exception(e);
         }
-        LOGGER.info(String.format("file %s was successfully encoded", destPath));
+        LOGGER.info(String.format("file %s was successfully encoded", source));
     }
 
     public String getID3_Title() {

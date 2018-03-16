@@ -56,6 +56,15 @@ public class MainController {
     @FXML
     public static Button btnAddNew;
 
+    @FXML
+    TableColumn idColumn;
+
+    @FXML
+    TableColumn titleColumn;
+
+    @FXML
+    TableColumn authorColumn;
+
     private Region pane;
     private Blog blog;
 
@@ -116,6 +125,11 @@ public class MainController {
             }
         });
 
+        List<MyPost> blogPosts = blog.getPosts();
+        for(int i = 0;i<blogPosts.size();i++){
+            //TODO: Show Posts
+        }
+
         //Todo: Posts
 
         System.out.println(config.getProtocol());
@@ -129,7 +143,7 @@ public class MainController {
             uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
             //exception.printStackTrace();
-           Alert login = new Alert(Alert.AlertType.INFORMATION, "Can't Login to the URL. Check the configuration, your Username and Password.\n Please try again!");
+           ShowAlert login = new ShowAlert(ShowAlert.AlertType.INFORMATION, "Can't Login to the URL. Check the configuration, your Username and Password.\n Please try again!");
             login.setTitle("Can't Login");
             login.showAndWait();
             Stage stage = (Stage) tableView.getScene().getWindow();
@@ -146,7 +160,7 @@ public class MainController {
         }*/
         //Stage stageMain = (Stage) btnAddNew.getScene().getWindow();
         //stageMain.hide();
-        openLogin();
+        //openLogin();
     }
 
     public void openLogin(){
@@ -218,18 +232,7 @@ public class MainController {
      */
     @FXML
     void menuHelp(ActionEvent event){
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Help.fxml"));
-        Parent root = null;
-        try {
-            root = fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //HelpController infocontroller = fxmlLoader.getController();
-        stageHelp.setTitle("Help");
-        stageHelp.setScene(new Scene(root));
-
-        stageHelp.show();
+        new LoadFxml("Controller/Help.fxml", "Help", new Stage());
     }
 
     /**

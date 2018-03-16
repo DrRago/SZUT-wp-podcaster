@@ -77,7 +77,7 @@
             <children>
                 <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#btnAddNew" text="Add New" fx:id="btnAddNew">
+                        <Button fx:id="btnAddNew" mnemonicParsing="false" onAction="#btnAddNew" text="Add New">
                             <graphic>
                                 <HBox>
                                     <children>
@@ -95,11 +95,11 @@
                         </Button>
                         <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn prefWidth="75.0" text="ID">
+                                <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID">
                                 </TableColumn>
-                                <TableColumn prefWidth="75.0" text="Title">
+                                <TableColumn fx:id="titleColumn" prefWidth="75.0" text="Title">
                                 </TableColumn>
-                                <TableColumn prefWidth="75.0" text="Author">
+                                <TableColumn fx:id="authorColumn" prefWidth="75.0" text="Author">
                                 </TableColumn>
                             </columns>
                             <columnResizePolicy>

@@ -1,10 +1,12 @@
 package config;
 
 import backend.fileTransfer.Protocols;
+import lombok.Getter;
 
 import java.io.*;
 import java.util.Properties;
 
+@Getter
 public class Config {
 
     private int port;
@@ -41,7 +43,7 @@ public class Config {
 
             // get the property value and print it outpublic void setServerURL(String text) {
             port = Integer.parseInt(prop.getProperty("port", "990"));
-            workingDir = prop.getProperty("workingDir", "/");
+            workingDir = prop.getProperty("workingDir", "/uploads");
             protocol = Protocols.valueOf(prop.getProperty("protocol", "FTPS"));
             wordpressUsername = prop.getProperty("wordpressUsername", "username");
             wordpressPassword = prop.getProperty("wordpressPassword", "password");
@@ -55,10 +57,10 @@ public class Config {
             id3_genre = prop.getProperty("id3_genre", "genre");
             mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
 
-            wordpressURL = prop.getProperty("wordpressURL", "localhost/wordpress");
+            wordpressURL = prop.getProperty("wordpressURL", "http://localhost/wordpress");
             serverUrl = prop.getProperty("serverURL", "localhost");
 
-            remotePath = prop.getProperty("remotePath", "/");
+            remotePath = prop.getProperty("remotePath", "http://localhost/uploads");
             input.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,14 +81,6 @@ public class Config {
         }
     }
 
-    public String getServerUsername() {
-        return serverUsername;
-    }
-
-    public String getServerPassword() {
-        return serverPassword;
-    }
-
     public void setServerUsername(String serverUsername) {
         this.serverUsername = serverUsername;
         setConfigEntry("serverUsername", serverUsername);
@@ -97,9 +91,6 @@ public class Config {
         setConfigEntry("serverPassword", serverPassword);
     }
 
-    public int getPort() {
-        return port;
-    }
 
     public void setPort(int port) {
         this.port = port;
@@ -116,26 +107,11 @@ public class Config {
         setConfigEntry("serverURL", String.valueOf(serverURL));
     }
 
-    public String getWordpressURL() {
-        return wordpressURL;
-    }
-
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
-    public String getWorkingDir() {
-        return workingDir;
-    }
-
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;
         setConfigEntry("workingDir", workingDir);
     }
 
-    public Protocols getProtocol() {
-        return protocol;
-    }
 
     public void setProtocol(Protocols protocol) {
         this.protocol = protocol;
@@ -146,21 +122,9 @@ public class Config {
         this.remotePath = remotePath;
     }
 
-    public String getRemotePath() {
-        return remotePath;
-    }
-
-    public String getWordpressUsername() {
-        return wordpressUsername;
-    }
-
     public void setWordpressUsername(String wordpressUsername) {
         this.wordpressUsername = wordpressUsername;
         setConfigEntry("wordpressUsername", wordpressUsername);
-    }
-
-    public String getWordpressPassword() {
-        return wordpressPassword;
     }
 
     public void setWordpressPassword(String wordpressPassword) {
@@ -168,17 +132,9 @@ public class Config {
         setConfigEntry("wordpressPassword", wordpressPassword);
     }
 
-    public int getBitrate() {
-        return mp3_bitrate;
-    }
-
     public void setBitrate(int bitrate) {
         this.mp3_bitrate = bitrate;
         setConfigEntry("mp3_bitrate", Integer.toString(bitrate));
-    }
-
-    public String getId3_title() {
-        return id3_title;
     }
 
     public void setId3_title(String id3_title) {
@@ -186,17 +142,9 @@ public class Config {
         setConfigEntry("id3_title", id3_title);
     }
 
-    public String getId3_artist() {
-        return id3_artist;
-    }
-
     public void setId3_artist(String id3_artist) {
         this.id3_artist = id3_artist;
         setConfigEntry("id3_artist", id3_artist);
-    }
-
-    public String getId3_year() {
-        return id3_year;
     }
 
     public void setId3_year(String id3_year) {
@@ -204,17 +152,9 @@ public class Config {
         setConfigEntry("id3_year", id3_year);
     }
 
-    public String getId3_comment() {
-        return id3_comment;
-    }
-
     public void setId3_comment(String id3_comment) {
         this.id3_comment = id3_comment;
         setConfigEntry("id3_comment", id3_comment);
-    }
-
-    public String getId3_genre() {
-        return id3_genre;
     }
 
     public void setId3_genre(String id3_genre) {

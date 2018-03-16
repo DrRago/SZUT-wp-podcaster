@@ -3,8 +3,6 @@ package backend.LameQueue;
 import backend.MediaFactory.Lame;
 import backend.wordpress.Blog;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class LameQueue extends ArrayList<Lame> {
@@ -14,29 +12,30 @@ public class LameQueue extends ArrayList<Lame> {
         this.wordpress = wordpress;
     }
 
-    public boolean add(Lame encoder) {
-        this.add(encoder);
-        return false;
-    }
-
-    public boolean startQueue() throws Exception {
+    public void startQueue() throws Exception {
         for (Lame item : this) {
             item.executeCommand();
             wordpress.addPost(item);
         }
-        return true;
     }
 
-    public void executeSetter(final Object value, final String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.out.println(Object.class.getClass().getName());
-        Method method;
-        for (Lame item : this) {
-            method = item.getClass().getMethod(methodName, Object.class);
-            method.invoke(item, value);
-        }
+    public void setTitle(final String title) {
+        this.forEach(lame -> lame.setID3_Title(title));
     }
 
-    public void setTitle(final String title) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        executeSetter(title, "setID3_Title");
+    public void setAlbum(final String album) {
+        this.forEach(lame -> lame.setID3_Album(album));
+    }
+
+    public void setYear(final String year) {
+        this.forEach(lame -> lame.setID3_ReleaseYear(year));
+    }
+
+    public void setGenre(final String genre) {
+        this.forEach(lame -> lame.setID3_Genre(genre));
+    }
+
+    public void setArtist(final String artist) {
+        this.forEach(lame -> lame.setID3_Artist(artist));
     }
 }

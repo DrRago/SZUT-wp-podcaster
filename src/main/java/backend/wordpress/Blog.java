@@ -28,10 +28,21 @@ public class Blog {
     private Uploader uploader;
     private URL remotePath;
 
-    public Blog(String wp_user, String wp_password, String xmlRpcUrl, Uploader uploader, String remotePath) throws IOException {
+    public Blog(String wp_user, String wp_password, String xmlRpcUrl, Uploader uploader, String remotePath) throws IOException, WordpressConnectionException {
         this.remotePath = new URL(remotePath);
         wp = new Wordpress(wp_user, wp_password, xmlRpcUrl);
+
+        try {
+            checkConnection();
+        } catch (XmlRpcFault | InsufficientRightsException e) {
+            throw new WordpressConnectionException(e.getMessage());
+        }
+
         this.uploader = uploader;
+    }
+
+    private void checkConnection() throws XmlRpcFault, InsufficientRightsException {
+        wp.getAuthors();
     }
 
     public List<MyPost> getPosts() throws XmlRpcFault, InsufficientRightsException, ObjectNotFoundException {

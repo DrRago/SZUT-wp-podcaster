@@ -97,7 +97,8 @@ public class Lame {
      */
     public void executeCommand() throws IOException, EncodingAlgorithmException {
         Path source = ID3TagUtil.getFile().toPath();
-        Path tmp = source.resolveSibling(ID3TagUtil.getFile().getName() + ".tmp");
+
+        Path tmp = Files.createTempFile(ID3TagUtil.getFile().getName(), ".tmp");
 
         LOGGER.info(String.format("encoding file %s", source));
         try {

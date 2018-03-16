@@ -1,38 +1,42 @@
 package backend.LameQueue;
 
 import backend.MediaFactory.Lame;
-import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
-import net.bican.wordpress.exceptions.InsufficientRightsException;
-import net.bican.wordpress.exceptions.InvalidArgumentsException;
-import net.bican.wordpress.exceptions.ObjectNotFoundException;
-import redstone.xmlrpc.XmlRpcFault;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
-public class LameQueue extends ArrayList<LameQueueItem> {
+public class LameQueue extends ArrayList<Lame> {
     private Blog wordpress;
 
     public LameQueue(Blog wordpress) {
         this.wordpress = wordpress;
     }
 
-    public void add(Lame encoder, String title, String status) {
-        this.add(new LameQueueItem(encoder, title, status));
+    public boolean add(Lame encoder) {
+        this.add(encoder);
+        return false;
     }
 
-    public boolean startQueue(List<String> titles, List<String> states) {
-        assert titles.size() == states.size() && states.size() == this.size() : String.format("Assert lists to have a size of %d, but %d and %d were given", this.size(), titles.size(), states.size());
-
-        this.forEach(lameQueueItem -> {
-            try {
-                wordpress.addPost(lameQueueItem.getTitle(), lameQueueItem.getStatus(), lameQueueItem.getEncoder());
-            } catch (InsufficientRightsException | InvalidArgumentsException | XmlRpcFault | UploaderException | ObjectNotFoundException | IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public boolean startQueue() throws Exception {
+        for (Lame item : this) {
+            item.executeCommand();
+            wordpress.addPost(item);
+        }
         return true;
+    }
+
+    public void executeSetter(final Object value, final String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        System.out.println(Object.class.getClass().getName());
+        Method method;
+        for (Lame item : this) {
+            method = item.getClass().getMethod(methodName, Object.class);
+            method.invoke(item, value);
+        }
+    }
+
+    public void setTitle(final String title) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        executeSetter(title, "setID3_Title");
     }
 }

@@ -1,6 +1,8 @@
 package backend.MediaFactory;
 
 import com.sun.xml.internal.org.jvnet.fastinfoset.EncodingAlgorithmException;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.farng.mp3.TagException;
@@ -19,8 +21,18 @@ public class Lame {
 
     private String command;
     private ID3TagUtil ID3TagUtil;
+    @Setter
+    @Getter
     private int bitrate;
+    @Setter
     private AudioMode audioMode = AudioMode.JOINT;
+
+    @Getter
+    @Setter
+    private String wp_postTitle;
+    @Getter
+    @Setter
+    private String wp_status;
 
     public Lame(String command, String file) throws IOException, TagException {
         initialize(command, file);
@@ -179,21 +191,7 @@ public class Lame {
         ID3TagUtil.setID3_Title(ID3_GENRE);
     }
 
-    public int getBitrate() {
-        return bitrate;
-    }
-
-    public void setBitrate(final int BITRATE) {
-        LOGGER.info(String.format("bitrate set to %s", BITRATE));
-        this.bitrate = BITRATE;
-    }
-
     public File getMP3File() {
         return ID3TagUtil.getFile();
-    }
-
-    public void setAudioMode(AudioMode audioMode) {
-        LOGGER.info(String.format("audio mode set to %s", audioMode));
-        this.audioMode = audioMode;
     }
 }

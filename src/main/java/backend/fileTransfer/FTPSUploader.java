@@ -3,8 +3,10 @@ package backend.fileTransfer;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPSClient;
 
-import java.io.*;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -64,7 +66,14 @@ public class FTPSUploader implements Uploader {
         try {
             fis = new FileInputStream(file);
             // Store file to server
-            client.storeFile(Paths.get(remote, file.getName()).toString(), fis);
+            String uploadPath;
+
+            if (remote.charAt(remote.length()-1) == '/') {
+                uploadPath = remote + file.getName();
+            } else {
+                uploadPath = remote + "/" + file.getName();
+            }
+            client.storeFile(uploadPath, fis);
 
             fis.close();
         } catch (IOException e) {

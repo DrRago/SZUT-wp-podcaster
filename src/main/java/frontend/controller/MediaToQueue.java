@@ -28,6 +28,9 @@ import util.PathUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MediaToQueue {
 
@@ -237,17 +240,22 @@ public class MediaToQueue {
         }
 
         file = getFile();
+
         if (file != null) {
 
             //TODO: remove already existing data in list
 
+            String tmpFile = file.toPath().toString()+".tmp";
+            if(!Paths.get(tmpFile).toFile().exists()) {
+                Files.copy(file.toPath(), Paths.get(tmpFile));
+            }
             //Create new Lame Object
             lame = new Lame(file.toURI().getPath());
             //Set the Title to the Name of the File
             titleTextField.setText(lame.getMP3File().getName());
 
             //Create a Media Object so the Data could be played
-            media = new Media(lame.getMP3File().toURI().toString());
+            media = new Media(Paths.get(tmpFile).toUri().toString());
 
             player = new MediaPlayer(media);
             mediaView = new MediaView(player);

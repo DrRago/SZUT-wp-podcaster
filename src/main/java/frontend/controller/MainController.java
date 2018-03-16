@@ -68,11 +68,6 @@ public class MainController {
     private Region pane;
     private Blog blog;
 
-
-
-    // Object to interact wiht for data
-    private InformationController infocontroller = null;
-
     private Config config = new Config();
 
     // Initialize windows for easy access
@@ -291,8 +286,6 @@ public class MainController {
 
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaQueue.fxml"));
         pane = fxmlLoader.load();
-        infocontroller = fxmlLoader.getController();
-        infocontroller.setController(this);
         // Create new Anchor Pane for the SidePane
 
         //EditPane.setMaxWidth(pane.getMaxWidth());

@@ -1,22 +1,31 @@
 package frontend.controller;
 
+import backend.fileTransfer.Uploader;
+import backend.fileTransfer.UploaderException;
+import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.WordpressConnectionException;
 import config.Config;
+import frontend.LoadingScreen;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import lombok.Setter;
 import util.PathUtil;
 
 import java.io.IOException;
+import java.util.List;
 
 public class WpLoginController {
 
@@ -41,9 +50,32 @@ public class WpLoginController {
     @FXML
     public Button cancelButton;
 
+    @FXML
+    CheckBox remember;
+
     private Config config;
 
     Blog blog = null;
+
+    //LoadingScreen loadingScreen = new LoadingScreen();
+
+    public void initialize() throws IOException {
+//        try {
+        //    loadingScreen.start(new Stage(StageStyle.UNDECORATED));
+      //      LoadingScreen.launch();
+    //    } catch (Exception e) {
+  //          e.printStackTrace();
+//        }
+        config = new Config();
+
+        //Remember true
+        if(config.getWpRemember()){
+            usernameTextField.setText(config.getWordpressUsername());
+            passwordTextField.setText(config.getWordpressPassword());
+            remotePathTextField.setText(config.getRemoteServerPath());
+            urlTextField.setText(config.getWordpressXmlrpcUrl());
+        }
+    }
 
     @FXML
     void cancelButton(ActionEvent event) {
@@ -54,18 +86,82 @@ public class WpLoginController {
     @FXML
     void loginButton(ActionEvent event) {
         try {
-            config = new Config();
 
-            config.setWordpressXmlrpcUrl(urlTextField.getText());
-            config.setWordpressUsername(usernameTextField.getText());
-            config.setWordpressPassword(passwordTextField.getText());
-            config.setRemoteServerPath(remotePathTextField.getText());
-            blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath());
-            openMain();
-        } catch (WordpressConnectionException | IOException e) {
+
+            ObservableList<String> errorMsg = FXCollections.observableArrayList();
+            if(urlTextField.getText()!=null){
+                config.setWordpressXmlrpcUrl(urlTextField.getText());
+                if(errorMsg.isEmpty()) {
+                    errorMsg.add("URL");
+                }
+            }
+            if(usernameTextField.getText()!=null){
+                config.setWordpressUsername(usernameTextField.getText());
+                if(errorMsg.isEmpty()) {
+                    errorMsg.add("Username");
+                }else{
+                    errorMsg.add("/ Username");
+                }
+            }
+            if(passwordTextField.getText()!=null){
+                config.setWordpressPassword(passwordTextField.getText());
+                if(errorMsg.isEmpty()) {
+                    errorMsg.add("Password");
+                }else{
+                    errorMsg.add("/ Password");
+                }
+            }
+            if(remotePathTextField.getText()!=null){
+                config.setRemoteServerPath(remotePathTextField.getText());
+                if(errorMsg.isEmpty()) {
+                    errorMsg.add("Remote Path");
+                }else{
+                    errorMsg.add("/ Remote Path");
+                }
+            }
+            if(config.getWordpressPassword()== null|| config.getWordpressUsername()== null || config.getWordpressXmlrpcUrl() == null || config.getRemoteServerPath() == null){
+                new ShowAlert("Couldn't Login to WordPress. Please check"+errorMsg+"!","Coudln't Login!");
+            }
+            else {
+                cancelButton(event);
+
+                //Loading Stage
+                /*Stage stage = new Stage(StageStyle.UNDECORATED);
+                FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Loading.fxml"));
+                Parent root = null;
+                try {
+                    root = fxmlLoader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                LoadingController loadingController = fxmlLoader.getController();
+                loadingController.setController(this);
+                stage.setScene(new Scene(root));
+                stage.show();*/
+//                loadingScreen.show();
+
+                Uploader uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
+
+                //blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), uploader, config.getRemoteServerPath());
+                blog = new Blog(usernameTextField.getText(), passwordTextField.getText(), urlTextField.getText(), uploader, remotePathTextField.getText());
+
+                openMain();
+                //loadingController.closeLoading();
+                cancelButton(event);
+            }
+        } catch (WordpressConnectionException |UploaderException| IOException e) {
             e.printStackTrace();
 
             new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
+        }
+    }
+
+    @FXML
+    void remember(ActionEvent event){
+        if(remember.isSelected()){
+            config.setWpRemember(true);
+        } else {
+            config.setWpRemember(false);
         }
     }
 

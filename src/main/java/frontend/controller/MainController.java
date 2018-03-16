@@ -184,8 +184,6 @@ public class MainController {
      * Access the Edit-Pane through the menubar
      * @param event
      */
-    @FXML
-    void menuEdit(MouseEvent event){btnEdit(event);}
 
     /**
      * Open a Help-Window
@@ -228,18 +226,6 @@ public class MainController {
     }
 
     /**
-     * Edit an entry through the button
-     * @param event
-     */
-    @FXML
-    void btnEdit(MouseEvent event) {
-        //if(tableView.getSelectionModel().getSelectedItems() != null && !pane.isVisible()) {
-        if(!pane.isVisible())openPane();
-                //TODO: Listing
-        //}
-    }
-
-    /**
      * Remove an entry through the button
      * @param event
      */
@@ -258,6 +244,14 @@ public class MainController {
 
     }
 
+    @FXML
+    void logoutBtn(ActionEvent event){
+        try {
+            uploader.disconnect();
+        } catch (UploaderException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void updatePosts(List<MyPost> posts){
         tableView.setItems((ObservableList) posts);

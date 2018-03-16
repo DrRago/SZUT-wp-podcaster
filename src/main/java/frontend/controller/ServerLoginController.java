@@ -5,8 +5,11 @@ import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import config.Config;
+import frontend.Run;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,11 +18,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import lombok.Setter;
 import util.PathUtil;
 
 import java.io.IOException;
 
 public class ServerLoginController {
+
+    @Setter
+    private Run controller;
 
     @FXML
     private TextField urlTextField;
@@ -51,7 +58,8 @@ public class ServerLoginController {
     public Uploader uploader = null;
     private Config config;
 
-    public void initialize() {
+    public void initialize() throws IOException {
+        config = new Config();
         //Set the Protocols in the ComboBox
         protocolComboBox.getItems().addAll(Protocols.FTPS, Protocols.SFTP);
         protocolComboBox.getSelectionModel().select(0);
@@ -66,6 +74,18 @@ public class ServerLoginController {
                 }
             }
         });
+
+        //Remember true
+        if (config.getServerRemember()) {
+            usernameTextField.setText(config.getUploadServerUsername());
+            passwordPasswordField.setText(config.getUploadServerPassword());
+            portTextField.setText(String.valueOf(config.getUploadServerPort()));
+            protocolComboBox.getSelectionModel().select(config.getUploadProtocol());
+            uploadpathTextField.setText(config.getUploadServerWorkingDir());
+            urlTextField.setText(config.getUploadServerUrl());
+        } else {
+
+        }
     }
 
 
@@ -82,20 +102,56 @@ public class ServerLoginController {
         } catch (Exception e) {
             //e.printStackTrace();
         }
-        config = new Config();
-        config.setUploadServerWorkingDir(uploadpathTextField.getText());
-        config.setUploadServerURL(urlTextField.getText());
-        config.setUploadServerUsername(usernameTextField.getText());
-        config.setUploadServerPassword(passwordPasswordField.getText());
-        config.setUploadServerPort(Integer.parseInt(portTextField.getText()));
+
+        ObservableList<String> errorMsg = FXCollections.observableArrayList();
+        if (!urlTextField.getText().isEmpty()) {
+            config.setUploadServerURL(urlTextField.getText());
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("URL");
+            }
+        }
+        if (!usernameTextField.getText().isEmpty()) {
+            config.setUploadServerUsername(usernameTextField.getText());
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Username");
+            } else {
+                errorMsg.add("/ Username");
+            }
+        }
+        if (!passwordPasswordField.getText().isEmpty()) {
+            config.setUploadServerPassword(passwordPasswordField.getText());
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Password");
+            } else {
+                errorMsg.add("/ Password");
+            }
+        }
+        if (!uploadpathTextField.getText().isEmpty()) {
+            config.setUploadServerWorkingDir(uploadpathTextField.getText());
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Upload Path");
+            } else {
+                errorMsg.add("/ Upload Path");
+            }
+        }
+        if (!portTextField.getText().isEmpty()) {
+            config.setUploadServerPort(Integer.parseInt(portTextField.getText()));
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Port");
+            } else {
+                errorMsg.add("/ Port");
+            }
+        }
         config.setUploadProtocol((Protocols) protocolComboBox.getSelectionModel().getSelectedItem());
 
+
         try {
-            uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
+            uploader = UploaderFactory.getUploader((Protocols) protocolComboBox.getSelectionModel().getSelectedItem(), urlTextField.getText(), Integer.parseInt(portTextField.getText()), usernameTextField.getText(), passwordPasswordField.getText(), uploadpathTextField.getText());
         } catch (UploaderException e) {
             e.printStackTrace();
             new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
         }
+
 
         Stage stageMain = new Stage();
 
@@ -108,7 +164,7 @@ public class ServerLoginController {
             System.out.println("Cant initialize, because of wrong Login");
         }
         WpLoginController controller = fxmlLoader.getController();
-        controller.setController(this);
+        //controller.setController(this);
         stageMain.setTitle("- Podcaster");
         stageMain.setScene(new Scene(root));
         stageMain.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
@@ -122,5 +178,4 @@ public class ServerLoginController {
     void rememberCheckBox(ActionEvent event) {
 
     }
-
 }

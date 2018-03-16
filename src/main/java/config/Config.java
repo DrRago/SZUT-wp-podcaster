@@ -38,6 +38,9 @@ public class Config {
     private String id3_genre;
     private int mp3_bitrate;
 
+    private Boolean wpRemember;
+    private Boolean serverRemember;
+
     /**
      * Instantiates a new Config.
      *
@@ -71,6 +74,8 @@ public class Config {
         id3_genre = prop.getProperty("id3_genre", "genre");
         mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
 
+        wpRemember = Boolean.valueOf(prop.getProperty("wpRemember", "false"));
+        serverRemember = Boolean.valueOf(prop.getProperty("serverRemember", "false"));
         input.close();
     }
 
@@ -167,6 +172,26 @@ public class Config {
     public void setRemoteServerPath(String remoteServerPath) {
         this.remoteServerPath = remoteServerPath;
         setConfigEntry("remoteServerPath", remoteServerPath);
+    }
+
+    /**
+     * Sets the remember of WordPress Login
+     *
+     * @param wpRemember
+     */
+    public void setWpRemember(Boolean wpRemember){
+        this.wpRemember = wpRemember;
+        setConfigEntry("wpRemember", wpRemember.toString());
+    }
+
+    /**
+     * Sets the remember of Server Login
+     *
+     * @param serverRemember
+     */
+    public void setServerRemember(Boolean serverRemember){
+        this.serverRemember = serverRemember;
+        setConfigEntry("serverRemember", serverRemember.toString());
     }
 
     /**
@@ -271,7 +296,7 @@ public class Config {
     public void saveConfig(String wordpressPassword, String uploadServerPassword, String uploadServerUsername,
                            String wordpressUsername, String uploadServerWorkingDir, String uploadServerUrl, Protocols uploadProtocol,
                            String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
-                           String id3_year, String id3_comment, String id3_genre, String remoteServerPath) {
+                           String id3_year, String id3_comment, String id3_genre, String remoteServerPath, Boolean wpRemember, Boolean serverRemember) {
         this.setWordpressPassword(wordpressPassword);
         this.setRemoteServerPath(remoteServerPath);
         this.setWordpressXmlrpcUrl(wordpressURL);
@@ -288,5 +313,7 @@ public class Config {
         this.setId3_year(id3_year);
         this.setId3_comment(id3_comment);
         this.setId3_genre(id3_genre);
+        this.setWpRemember(wpRemember);
+        this.setServerRemember(serverRemember);
     }
 }

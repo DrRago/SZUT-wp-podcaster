@@ -151,6 +151,7 @@ public class MediaToQueue {
         lame.setID3_ReleaseYear(yearTextField.getText());
         lame.setWp_status(uploadConfig.getSelectionModel().getSelectedItem());
         lame.setWp_postTitle(wpTitleTextField.getText());
+        lame.setBitrate(((int) bitRateSlider.getValue()));
 
         AudioMode audioMode = null;
         Toggle currentToggle = group.getSelectedToggle();

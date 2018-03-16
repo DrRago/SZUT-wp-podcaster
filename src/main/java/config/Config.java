@@ -7,12 +7,14 @@ import java.util.Properties;
 
 public class Config {
 
-    private String hostname;
     private int port;
     private String workingDir;
     private Protocols protocol;
-    private String username;
-    private String password;
+    private String wordpressUsername;
+    private String wordpressPassword;
+
+    private String serverUsername;
+    private String serverPassword;
 
     private String id3_title;
     private String id3_artist;
@@ -21,7 +23,10 @@ public class Config {
     private String id3_genre;
     private int mp3_bitrate;
 
+    private String remotePath;
+
     private String wordpressURL;
+    private String serverUrl;
 
     private String configPath;
     private Properties prop = new Properties();
@@ -34,14 +39,15 @@ public class Config {
             input = new FileInputStream(configPath);
             prop.load(input);
 
-            // get the property value and print it out
-            hostname = prop.getProperty("hostname", "127.0.0.1");
+            // get the property value and print it outpublic void setServerURL(String text) {
             port = Integer.parseInt(prop.getProperty("port", "990"));
             workingDir = prop.getProperty("workingDir", "/");
             protocol = Protocols.valueOf(prop.getProperty("protocol", "FTPS"));
-            username = prop.getProperty("username", "username");
-            password = prop.getProperty("password", "password");
+            wordpressUsername = prop.getProperty("wordpressUsername", "username");
+            wordpressPassword = prop.getProperty("wordpressPassword", "password");
 
+            serverUsername = prop.getProperty("serverUsername", "username");
+            serverPassword = prop.getProperty("serverPassword", "password");
             id3_title = prop.getProperty("id3_title", "title");
             id3_artist = prop.getProperty("id3_artist", "artist");
             id3_year = prop.getProperty("id3_year", "1337");
@@ -50,6 +56,7 @@ public class Config {
             mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
 
             wordpressURL = prop.getProperty("wordpressURL", "localhost/wordpress");
+            serverUrl = prop.getProperty("serverURL", "localhost");
 
             input.close();
         } catch (IOException e) {
@@ -71,13 +78,22 @@ public class Config {
         }
     }
 
-    public String getHostname() {
-        return hostname;
+    public String getServerUsername() {
+        return serverUsername;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-        setConfigEntry("hostname", hostname);
+    public String getServerPassword() {
+        return serverPassword;
+    }
+
+    public void setServerUsername(String serverUsername) {
+        this.serverUsername = serverUsername;
+        setConfigEntry("serverUsername", serverUsername);
+    }
+
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
+        setConfigEntry("serverPassword", serverPassword);
     }
 
     public int getPort() {
@@ -89,13 +105,22 @@ public class Config {
         setConfigEntry("port", String.valueOf(port));
     }
 
-    public void setWordpressURL(String wordpressURL){
+    public void setWordpressURL(String wordpressURL) {
         this.wordpressURL = wordpressURL;
         setConfigEntry("wordpressURL", String.valueOf(wordpressURL));
     }
 
-    public String getWordpressURL(){
+    public void setServerURL(String serverURL) {
+        this.serverUrl = serverURL;
+        setConfigEntry("serverURL", String.valueOf(serverURL));
+    }
+
+    public String getWordpressURL() {
         return wordpressURL;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public String getWorkingDir() {
@@ -116,22 +141,30 @@ public class Config {
         setConfigEntry("protocol", protocol.toString());
     }
 
-    public String getUsername() {
-        return username;
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-        setConfigEntry("username", username);
+    public String getRemotePath() {
+        return remotePath;
     }
 
-    public String getPassword() {
-        return password;
+    public String getWordpressUsername() {
+        return wordpressUsername;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-        setConfigEntry("password", password);
+    public void setWordpressUsername(String wordpressUsername) {
+        this.wordpressUsername = wordpressUsername;
+        setConfigEntry("wordpressUsername", wordpressUsername);
+    }
+
+    public String getWordpressPassword() {
+        return wordpressPassword;
+    }
+
+    public void setWordpressPassword(String wordpressPassword) {
+        this.wordpressPassword = wordpressPassword;
+        setConfigEntry("wordpressPassword", wordpressPassword);
     }
 
     public int getBitrate() {
@@ -188,12 +221,17 @@ public class Config {
         setConfigEntry("id3_genre", id3_genre);
     }
 
-    public void saveConfig(String password, String hostname, String username, String workingDir,
-                           Protocols protocol, String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
-                           String id3_year, String id3_comment, String id3_genre) {
-        this.setPassword(password);
-        this.setHostname(hostname);
-        this.setUsername(username);
+    public void saveConfig(String wordpressPassword, String wordpressUrl, String serverPassword, String serverUsername,
+                           String wordpressUsername, String workingDir, String serverUrl, Protocols protocol,
+                           String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
+                           String id3_year, String id3_comment, String id3_genre, String remotePath) {
+        this.setWordpressPassword(wordpressPassword);
+        this.setRemotePath(remotePath);
+        this.setWordpressURL(wordpressURL);
+        this.setServerURL(serverUrl);
+        this.setServerPassword(serverPassword);
+        this.setServerUsername(serverUsername);
+        this.setWordpressUsername(wordpressUsername);
         this.setWorkingDir(workingDir);
         this.setProtocol(protocol);
         this.setWordpressURL(wordpressURL);

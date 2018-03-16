@@ -4,6 +4,7 @@ import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
+import backend.wordpress.WordpressConnectionException;
 import config.Config;
 import frontend.OpenMainWindowLogin;
 import frontend.controller.MainController;
@@ -34,7 +35,7 @@ import static frontend.controller.MainController.uploader;
 public class WpLoginController {
 
     @Setter
-    private MainController controller;
+    private ServerLoginController controller;
 
     @FXML
     public TextField urlTextField;
@@ -56,8 +57,6 @@ public class WpLoginController {
 
     private Config config = new Config();
 
-    ServerLoginController serverLoginController = new ServerLoginController();
-
     Blog blog = null;
 
     @FXML
@@ -68,11 +67,17 @@ public class WpLoginController {
 
     @FXML
     void loginButton(ActionEvent event){
+        config.setWordpressURL(urlTextField.getText());
+        config.setWordpressUsername(usernameTextField.getText());
+        config.setWordpressPassword(passwordTextField.getText());
+        config.setRemotePath(remotePathTextField.getText());
         try {
-            blog = new Blog(usernameTextField.getText(), passwordTextField.getText(), urlTextField.getText(), serverLoginController.uploader,remotePathTextField.getText());
+            blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), controller.uploader, config.getRemotePath());
             openMain();
-        } catch (IOException e) {
+        } catch (WordpressConnectionException|IOException e) {
             e.printStackTrace();
+
+            new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
         }
     }
 

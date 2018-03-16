@@ -27,7 +27,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
-import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.Setter;
@@ -37,10 +36,7 @@ import net.bican.wordpress.exceptions.ObjectNotFoundException;
 import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 
 public class PodcastController {
@@ -117,7 +113,7 @@ public class PodcastController {
         controller.closePodcast();
 
         System.out.println(optionController.getUploader());
-        Blog blog = new Blog(config.getUsername(), config.getPassword(), config.getHostname() , optionController.getUploader(), config.getWorkingDir());
+        Blog blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getHostname() , optionController.getUploader(), config.getWorkingDir());
 
         ObservableList<Lame> lameItems = mediaDescriptioncontroller.lameItems;
         for(int i = 0; lameItems.size()>i; i++){

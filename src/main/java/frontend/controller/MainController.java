@@ -1,8 +1,6 @@
 package frontend.controller;
 
-import backend.MediaFactory.Lame;
 import backend.fileTransfer.Uploader;
-import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
@@ -24,10 +22,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lombok.Setter;
-import net.bican.wordpress.exceptions.InsufficientRightsException;
-import net.bican.wordpress.exceptions.ObjectNotFoundException;
-import org.farng.mp3.TagException;
-import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
@@ -98,11 +92,12 @@ public class MainController {
      */
     public void initialize() throws Exception {
         statusbar.setProgress(0.0);
-        try {
+/*        try {
             loadPane();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
         statusTypeLabel.setVisible(false);
         statusbar.setVisible(false);
 
@@ -113,21 +108,7 @@ public class MainController {
         tableView.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.isPrimaryButtonDown() && event.getClickCount() == 2){
-                    Lame post = null;
-                    try {
-                        post = blog.editDownload(((MyPost) tableView.getSelectionModel().getSelectedItem()).getPostID());
-                    } catch (XmlRpcFault | ObjectNotFoundException | InsufficientRightsException | IOException | UploaderException | TagException e) {
-                        e.printStackTrace();
-                    }
-                    menuEdit(event);
-                    infocontroller.setTitle(post.getID3_Title());
-                    infocontroller.setAlbum(post.getID3_Album());
-                    infocontroller.setAuthor(post.getID3_Artist());
-                    infocontroller.setComment(post.getID3_Comment());
-                    infocontroller.setGenre(post.getID3_Genre());
-                    infocontroller.setYear(post.getID3_ReleaseYear());
-                }
+
             }
         });
 
@@ -137,8 +118,8 @@ public class MainController {
         System.out.println(config.getProtocol());
         System.out.println(config.getHostname());
         System.out.println(config.getPort());
-        System.out.println(config.getUsername());
-        System.out.println(config.getPassword());
+        System.out.println(config.getWordpressUsername());
+        System.out.println(config.getWordpressPassword());
         System.out.println(config.getWorkingDir());
 
 

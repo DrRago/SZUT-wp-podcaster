@@ -6,7 +6,6 @@ import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import config.Config;
-import frontend.controller.MainController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -87,17 +86,18 @@ public class ServerLoginController {
             //e.printStackTrace();
         }
         config.setWorkingDir(uploadpathTextField.getText());
-        config.setWordpressURL(urlTextField.getText());
-        config.setUsername(usernameTextField.getText());
-        config.setPassword(passwordPasswordField.getText());
+        config.setServerURL(urlTextField.getText());
+        config.setServerUsername(usernameTextField.getText());
+        config.setServerPassword(passwordPasswordField.getText());
         config.setPort(Integer.parseInt(portTextField.getText()));
         config.setProtocol((Protocols) protocolComboBox.getSelectionModel().getSelectedItem());
 
         try{
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
+            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getServerUrl(), config.getPort(), config.getServerUsername(), config.getServerPassword(), config.getWorkingDir());
         }
         catch (UploaderException e) {
             e.printStackTrace();
+            new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
         }
 
         Stage stageMain = new Stage();
@@ -110,6 +110,8 @@ public class ServerLoginController {
             //e.printStackTrace();
             System.out.println("Cant initialize, because of wrong Login");
         }
+        WpLoginController controller = fxmlLoader.getController();
+        controller.setController(this);
         stageMain.setTitle("- Podcaster");
         stageMain.setScene(new Scene(root));
         stageMain.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));

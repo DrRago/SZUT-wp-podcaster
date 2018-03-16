@@ -180,13 +180,13 @@ public class MediaQueue {
         /*Config config = new Config();
         Uploader uploader = null;
         try {
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
+            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir());
         } catch (UploaderException e) {
             e.printStackTrace();
         }
         Blog blog = null;
         try {
-            blog = new Blog(config.getUsername(), config.getPassword(), config.getWordpressURL(), uploader,config.getWorkingDir());
+            blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressURL(), uploader,config.getWorkingDir());
         } catch (IOException e) {
             e.printStackTrace();
         }

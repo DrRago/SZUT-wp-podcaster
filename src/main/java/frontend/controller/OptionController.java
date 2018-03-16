@@ -1,27 +1,17 @@
 package frontend.controller;
 
-import backend.MediaFactory.Lame;
 import backend.fileTransfer.Protocols;
 import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
-import backend.wordpress.MyPost;
 import config.Config;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.Setter;
-import org.farng.mp3.TagException;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class OptionController {
 
@@ -91,7 +81,7 @@ public class OptionController {
      */
     @FXML
     public void saveOptions(ActionEvent e) throws IOException, UploaderException {
-//        if(MainController.uploader != UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir())) MainController.uploader.disconnect();
+//        if(MainController.uploader != UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir())) MainController.uploader.disconnect();
         if(MainController.uploader != null)MainController.uploader.disconnect();
         config.saveConfig(
                 passwdOption.getText(),
@@ -111,7 +101,7 @@ public class OptionController {
         cancelOptions(e);
 
         try {
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
+            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
             exception.printStackTrace();
         }

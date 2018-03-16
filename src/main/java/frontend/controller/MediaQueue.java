@@ -179,19 +179,13 @@ public class MediaQueue {
         //closeBtn(event);
 
         //TODO: Close Process for the Media
-        System.out.println(postListView.getItems());
-        System.out.println(postList);
-
         config = new Config();
         LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath()));
         for(int i = 0; i<postList.size(); i++) {
             lameQueue.add(postList.get(i));
             postList.remove(i);
         }
-        postListView.getItems().removeAll(postList);
-        System.out.println(postList);
         lameQueue.startQueue();
-
     }
 
     @FXML

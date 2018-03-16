@@ -26,9 +26,12 @@ import org.farng.mp3.TagException;
 import util.PathUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class MediaToQueue {
 
@@ -138,7 +141,7 @@ public class MediaToQueue {
     }
 
     @FXML
-    void acceptBtn(ActionEvent event) {
+    void acceptBtn(ActionEvent event) throws IOException {
         //Set the ID3 Tags to the Lame Object
         lame.setID3_Title(titleTextField.getText());
         lame.setID3_Album(albumTextField.getText());
@@ -177,16 +180,6 @@ public class MediaToQueue {
         }
         player.stop();
         player.dispose();
-        mediaView.setMediaPlayer(null);
-        media = null;
-        lame.getMP3File().delete();
-        //mediaView.setMediaPlayer(null);
-        System.out.println(media);
-        System.out.println(player.getMedia());
-        player = null;
-        System.out.println(player.getMedia());
-
-
     }
 
     @FXML
@@ -240,10 +233,12 @@ public class MediaToQueue {
         if (file != null) {
 
             //TODO: remove already existing data in list
+            Path tmpFile = Files.createTempFile(file.getName(), ".mediaplayer.tmp");
 
-            String tmpFile = file.toPath().toString()+".tmp";
-            if(!Paths.get(tmpFile).toFile().exists()) {
-                Files.copy(file.toPath(), Paths.get(tmpFile));
+            copyFileConetents(file, tmpFile.toFile());
+
+            if(!tmpFile.toFile().exists()) {
+                Files.copy(file.toPath(), tmpFile);
             }
             //Create new Lame Object
             lame = new Lame(file.toURI().getPath());
@@ -251,7 +246,7 @@ public class MediaToQueue {
             titleTextField.setText(lame.getMP3File().getName());
 
             //Create a Media Object so the Data could be played
-            media = new Media(Paths.get(tmpFile).toUri().toString());
+            media = new Media(tmpFile.toUri().toString());
 
             player = new MediaPlayer(media);
             mediaView = new MediaView(player);
@@ -310,6 +305,20 @@ public class MediaToQueue {
             });
         }
 
+    }
+
+    private void copyFileConetents(File source, File destination) throws IOException {
+        FileChannel srcChannel = new FileInputStream(source).getChannel();
+
+        // Create channel on the destination
+        FileChannel dstChannel = new FileOutputStream(destination).getChannel();
+
+        // Copy file contents from source to destination
+        dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
+
+        // Close the channels
+        srcChannel.close();
+        dstChannel.close();
     }
 
 

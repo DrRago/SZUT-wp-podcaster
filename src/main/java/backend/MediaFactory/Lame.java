@@ -16,6 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The Lame class holds the mp3 file and its ID3 tags.
+ * It can execute the lame encoder to encode this mp3 file.
+ */
 public class Lame {
     private static final Logger LOGGER = Logger.getGlobal();
 
@@ -34,10 +38,13 @@ public class Lame {
     @Setter
     private String wp_status;
 
-    public Lame(String command, String file) throws IOException, TagException {
-        initialize(command, file);
-    }
-
+    /**
+     * Instantiates a new Lame.
+     *
+     * @param file the mp3 file that will be encoded
+     * @throws IOException  thrown if the file could not be found
+     * @throws TagException the tag exception
+     */
     public Lame(String file) throws IOException, TagException {
         String command;
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -82,9 +89,15 @@ public class Lame {
         LOGGER.info(String.format("Lame found for machine (%s)", System.getProperty("os.name")));
     }
 
-    public void executeCommand() throws Exception {
+    /**
+     * start the encoding of the mp3 file. This method uses the lame encoder, that also sets id3 tags by itself.
+     *
+     * @throws IOException                the io exception
+     * @throws EncodingAlgorithmException the encoding algorithm exception
+     */
+    public void executeCommand() throws IOException, EncodingAlgorithmException {
         Path source = ID3TagUtil.getFile().toPath();
-        Path temp = source.resolveSibling(ID3TagUtil.getFile().getName() + ".temp");
+        Path tmp = source.resolveSibling(ID3TagUtil.getFile().getName() + ".tmp");
 
         LOGGER.info(String.format("encoding file %s", source));
         try {
@@ -103,7 +116,7 @@ public class Lame {
             commandList.add("--add-id3v2");
             commandList.addAll(Arrays.asList("--silent", "-q", "0"));
             commandList.add("\"" + source + "\"");
-            commandList.add("\"" + temp + "\"");
+            commandList.add("\"" + tmp + "\"");
 
             LOGGER.info(String.format("executing command %s", StringUtils.join(commandList, " ")));
 
@@ -125,72 +138,139 @@ public class Lame {
                 throw new EncodingAlgorithmException(builder.toString());
             }
             LOGGER.info(String.format("backing up %s", source));
-            Files.move(source, source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"));
+            if (Files.exists(source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"))) {
+                LOGGER.info("file %s already backed up. Skipping backup and removing old file...");
+                Files.delete(source);
+            } else {
+                Files.move(source, source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"));
+            }
             LOGGER.info(String.format("writing file %s", source));
-            Files.move(temp, source);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LOGGER.severe("unexpected failure");
-            Files.delete(temp);
-            throw new Exception(e);
+            Files.move(tmp, source);
+        } finally {
+            Files.delete(tmp);
         }
         LOGGER.info(String.format("file %s was successfully encoded", source));
     }
 
+    /**
+     * Gets the ID3 title.
+     *
+     * @return the title
+     */
     public String getID3_Title() {
         return ID3TagUtil.getID3_Title();
     }
 
+    /**
+     * Sets the ID3 title.
+     *
+     * @param ID3_TITLE the title
+     */
     public void setID3_Title(final String ID3_TITLE) {
         LOGGER.info(String.format("ID3_Title set to %s", ID3_TITLE));
         ID3TagUtil.setID3_Title(ID3_TITLE);
     }
 
+    /**
+     * Gets the ID3 artist.
+     *
+     * @return the artist
+     */
     public String getID3_Artist() {
         return ID3TagUtil.getID3_Artist();
     }
 
+    /**
+     * Sets the ID3 artist.
+     *
+     * @param ID3_ARTIST the artist
+     */
     public void setID3_Artist(final String ID3_ARTIST) {
         LOGGER.info(String.format("ID3_Artist set to %s", ID3_ARTIST));
-        ID3TagUtil.setID3_Title(ID3_ARTIST);
+        ID3TagUtil.setID3_Artist(ID3_ARTIST);
     }
 
+    /**
+     * Gets the ID3 album.
+     *
+     * @return the album
+     */
     public String getID3_Album() {
         return ID3TagUtil.getID3_Album();
     }
 
+    /**
+     * Sets ID3 album.
+     *
+     * @param ID3_ALBUM the album
+     */
     public void setID3_Album(final String ID3_ALBUM) {
         LOGGER.info(String.format("ID3_Album set to %s", ID3_ALBUM));
-        ID3TagUtil.setID3_Title(ID3_ALBUM);
+        ID3TagUtil.setID3_Album(ID3_ALBUM);
     }
 
+    /**
+     * Gets ID3 release year.
+     *
+     * @return the release year
+     */
     public String getID3_ReleaseYear() {
         return ID3TagUtil.getID3_ReleaseYear();
     }
 
+    /**
+     * Sets the ID3 release year.
+     *
+     * @param ID3_RELEASEYEAR the release year
+     */
     public void setID3_ReleaseYear(final String ID3_RELEASEYEAR) {
         LOGGER.info(String.format("ID3_ReleaseYear set to %s", ID3_RELEASEYEAR));
-        ID3TagUtil.setID3_Title(ID3_RELEASEYEAR);
+        ID3TagUtil.setID3_ReleaseYear(ID3_RELEASEYEAR);
     }
 
+    /**
+     * Gets the ID3 comment.
+     *
+     * @return the comment
+     */
     public String getID3_Comment() {
         return ID3TagUtil.getID3_Comment();
     }
 
+    /**
+     * Sets the ID3 comment.
+     *
+     * @param ID3_COMMENT the comment
+     */
     public void setID3_Comment(final String ID3_COMMENT) {
         LOGGER.info(String.format("ID3_Comment set to %s", ID3_COMMENT));
-        ID3TagUtil.setID3_Title(ID3_COMMENT);
+        ID3TagUtil.setID3_Comment(ID3_COMMENT);
     }
 
+    /**
+     * Gets the ID3 genre.
+     *
+     * @return the genre
+     */
     public String getID3_Genre() {
         return ID3TagUtil.getID3_Genre();
     }
 
+    /**
+     * Sets the ID3 genre.
+     *
+     * @param ID3_GENRE the genre
+     */
     public void setID3_Genre(final String ID3_GENRE) {
         LOGGER.info(String.format("ID3_Genre set to %s", ID3_GENRE));
-        ID3TagUtil.setID3_Title(ID3_GENRE);
+        ID3TagUtil.setID3_Genre(ID3_GENRE);
     }
 
+    /**
+     * Gets the mp3 file.
+     *
+     * @return the mp3 file
+     */
     public File getMP3File() {
         return ID3TagUtil.getFile();
     }

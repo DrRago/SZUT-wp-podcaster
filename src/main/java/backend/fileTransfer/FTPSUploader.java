@@ -7,12 +7,25 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
+/**
+ * The ftps uploader.
+ */
 public class FTPSUploader implements Uploader {
     private static final Logger LOGGER = Logger.getGlobal();
 
     private FTPSClient client = new FTPSClient(true);
     private String remote;
 
+    /**
+     * Instantiates a new Ftps uploader.
+     *
+     * @param hostname   the hostname for the ftps server
+     * @param port       the port to connect to
+     * @param username   the username
+     * @param password   the password
+     * @param workingDir the working dir the files should be uploaded to
+     * @throws UploaderException the exception if any errors occur during connecting
+     */
     public FTPSUploader(String hostname, int port, String username, String password, String workingDir) throws UploaderException {
         try {
             client.connect(hostname, port);
@@ -35,6 +48,7 @@ public class FTPSUploader implements Uploader {
 
         remote = workingDir;
     }
+
 
     @Override
     public String uploadFile(String filePath) throws UploaderException {
@@ -62,27 +76,13 @@ public class FTPSUploader implements Uploader {
     }
 
     @Override
-    public void downloadFile(String remoteFile, String localPath) throws UploaderException {
-        remoteFile = Paths.get(remote, remoteFile).toString();
-        LOGGER.info(String.format("Starting download of \"%s\" to \"%s\"", remoteFile, localPath));
+    public void disconnect() throws UploaderException {
         try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localPath));
-            client.retrieveFile(remoteFile, outputStream);
-            if (client.getReplyCode() != 226) {
-                LOGGER.severe(client.getReplyString().trim());
-                throw new UploaderException(client.getReplyString().trim());
-            }
-            outputStream.close();
-            LOGGER.info(String.format("Action completed with success code %d: file stored to %s", client.getReplyCode(), localPath));
+            client.logout();
+            LOGGER.info(client.getReplyString().trim());
+            client.disconnect();
         } catch (IOException e) {
             throw new UploaderException(e);
         }
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        client.logout();
-        LOGGER.info(client.getReplyString().trim());
-        client.disconnect();
     }
 }

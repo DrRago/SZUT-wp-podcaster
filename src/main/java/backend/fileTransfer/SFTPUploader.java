@@ -7,18 +7,31 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
+/**
+ * The SFTP uploader.
+ */
 public class SFTPUploader implements Uploader {
     private static final java.util.logging.Logger LOGGER = Logger.getGlobal();
 
     private ChannelSftp sftpChannel;
     private Session session;
 
-    SFTPUploader(String URL, int port, String username, String password, String workingDir) throws UploaderException {
+    /**
+     * Instantiates a new SFTP uploader.
+     *
+     * @param hostname   the hostname of the sftp server
+     * @param port       the port to connect to
+     * @param username   the username
+     * @param password   the password
+     * @param workingDir the working dir the files should be uploaded to
+     * @throws UploaderException the exception if any errors occur during connecting
+     */
+    SFTPUploader(String hostname, int port, String username, String password, String workingDir) throws UploaderException {
         Channel channel;
 
         try {
             JSch jsch = new JSch();
-            session = jsch.getSession(username, URL, port);
+            session = jsch.getSession(username, hostname, port);
             session.setPassword(password);
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
@@ -27,7 +40,7 @@ public class SFTPUploader implements Uploader {
             channel = session.openChannel("sftp");
             channel.connect();
             sftpChannel = (ChannelSftp) channel;
-            LOGGER.info(String.format("connected to %s:%d", URL, port));
+            LOGGER.info(String.format("connected to %s:%d", hostname, port));
             setRemotePath(workingDir);
         } catch (JSchException | SftpException e) {
             LOGGER.severe(e.getMessage());
@@ -35,6 +48,7 @@ public class SFTPUploader implements Uploader {
         }
     }
 
+    @Override
     public String uploadFile(String filePath) throws FileNotFoundException, UploaderException {
         LOGGER.info(String.format("uploading file \"%s\" to %s", filePath, session.getHost()));
         File f = new File(filePath);
@@ -47,23 +61,12 @@ public class SFTPUploader implements Uploader {
         return "200";
     }
 
-    @Override
-    public void downloadFile(String remoteFile, String localPath) throws UploaderException {
-        LOGGER.info(String.format("downloading file \"%s\" to \"%s\"", remoteFile, localPath));
-        try {
-            sftpChannel.get(remoteFile, localPath);
-            LOGGER.info("download complete successfully");
-        } catch (SftpException e) {
-            LOGGER.severe(e.getMessage());
-            throw new UploaderException(e);
-        }
-    }
-
     private void setRemotePath(String path) throws SftpException {
         sftpChannel.cd(path);
         LOGGER.info(String.format("remote path set to \"%s\"", path));
     }
 
+    @Override
     public void disconnect() {
         sftpChannel.exit();
         session.disconnect();

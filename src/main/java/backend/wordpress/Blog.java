@@ -9,14 +9,11 @@ import net.bican.wordpress.Wordpress;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
 import net.bican.wordpress.exceptions.InvalidArgumentsException;
 import net.bican.wordpress.exceptions.ObjectNotFoundException;
-import org.farng.mp3.TagException;
-import org.jsoup.Jsoup;
 import redstone.xmlrpc.XmlRpcFault;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -52,23 +49,6 @@ public class Blog {
             posts.add(new MyPost(post.getPost_id(), post.getPost_title(), wp.getUser(post.getPost_author()).getNickname()));
         }
         return posts;
-    }
-
-    public Lame editDownload(int postID) throws XmlRpcFault, ObjectNotFoundException, InsufficientRightsException, IOException, UploaderException, TagException {
-        Post post = wp.getPost(postID);
-        URL mp3url = new URL(Jsoup.parse(post.getPost_content()).select("a").attr("href"));
-        String remoteFilename = new File(mp3url.getFile()).getName();
-
-        File directory = new File("blogfiles");
-        if (!directory.exists()) directory.mkdir();
-
-        String localFilename = Paths.get("blogfiles", remoteFilename).toString();
-        if (new File(localFilename).exists()) {
-            LOGGER.info(String.format("File \"%s\" already downloaded, skipping file..", localFilename));
-        } else {
-            uploader.downloadFile(remoteFilename, localFilename);
-        }
-        return new Lame(localFilename);
     }
 
     public void addPost(Lame encoder) throws InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException, IOException {

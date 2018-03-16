@@ -41,7 +41,7 @@ public class WpLoginController {
     @FXML
     public Button cancelButton;
 
-    private Config config = new Config();
+    private Config config;
 
     Blog blog = null;
 
@@ -52,15 +52,17 @@ public class WpLoginController {
     }
 
     @FXML
-    void loginButton(ActionEvent event){
-        config.setWordpressURL(urlTextField.getText());
-        config.setWordpressUsername(usernameTextField.getText());
-        config.setWordpressPassword(passwordTextField.getText());
-        config.setRemotePath(remotePathTextField.getText());
+    void loginButton(ActionEvent event) {
         try {
-            blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), controller.uploader, config.getRemotePath());
+            config = new Config();
+
+            config.setWordpressXmlrpcUrl(urlTextField.getText());
+            config.setWordpressUsername(usernameTextField.getText());
+            config.setWordpressPassword(passwordTextField.getText());
+            config.setRemoteServerPath(remotePathTextField.getText());
+            blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath());
             openMain();
-        } catch (WordpressConnectionException|IOException e) {
+        } catch (WordpressConnectionException | IOException e) {
             e.printStackTrace();
 
             new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");

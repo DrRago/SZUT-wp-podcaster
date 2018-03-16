@@ -2,7 +2,6 @@ package frontend.controller;
 
 import backend.MediaFactory.AudioMode;
 import backend.MediaFactory.Lame;
-import config.Config;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -29,7 +28,6 @@ import util.PathUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class MediaToQueue {
@@ -98,8 +96,6 @@ public class MediaToQueue {
 
     @FXML
     TextField wpTitleTextField;
-
-    private Config config = new Config();
 
     private Pane pane;
 

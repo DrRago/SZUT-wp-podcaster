@@ -89,7 +89,7 @@ public class MediaQueue {
     protected final ToggleGroup group = new ToggleGroup();
     public ObservableList<Lame> postList = FXCollections.observableArrayList();
 
-    Config config = new Config();
+    Config config;
 
     public void initialize() {
         postListView.setCellFactory(lv -> {
@@ -182,7 +182,8 @@ public class MediaQueue {
         System.out.println(postListView.getItems());
         System.out.println(postList);
 
-        LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), controller.uploader, config.getRemotePath()));
+        config = new Config();
+        LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath()));
         for(int i = 0; i<postList.size(); i++) {
             lameQueue.add(postList.get(i));
             postList.remove(i);

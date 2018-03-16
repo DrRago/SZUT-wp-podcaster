@@ -3,7 +3,6 @@ package frontend.controller;
 import backend.fileTransfer.Protocols;
 import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
-import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import config.Config;
 import javafx.event.ActionEvent;
@@ -51,7 +50,7 @@ public class OptionController {
     @FXML
     TextField mp3_genre; // in config = id3_genre
 
-    Config config = new Config();
+    Config config;
 
     public Uploader uploader = null;
 
@@ -81,6 +80,7 @@ public class OptionController {
      */
     @FXML
     public void saveOptions(ActionEvent e) throws IOException, UploaderException {
+        config = new Config();
 //        if(MainController.uploader != UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir())) MainController.uploader.disconnect();
         if(MainController.uploader != null)MainController.uploader.disconnect();
         /*config.saveConfig(

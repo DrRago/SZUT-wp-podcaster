@@ -19,7 +19,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Setter;
 import util.PathUtil;
@@ -68,7 +71,7 @@ public class MainController {
     private Region pane;
     private Blog blog;
 
-    private Config config = new Config();
+    private Config config;
 
     // Initialize windows for easy access
     public static Stage stagePodcast = new Stage();
@@ -87,6 +90,7 @@ public class MainController {
      * Load default images
      */
     public void initialize() throws Exception {
+        config = new Config();
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("postID"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("postTitle"));
@@ -113,8 +117,8 @@ public class MainController {
             }
         });
 
-        uploader = UploaderFactory.getUploader(config.getProtocol(), config.getServerUrl(), config.getPort(), config.getServerUsername(), config.getServerPassword(), config.getWorkingDir());
-        blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), uploader, config.getRemotePath());
+        uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
+        blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), uploader, config.getRemoteServerPath());
         List<MyPost> recentUploadedPosts = blog.getPosts();
 
         tableView.getItems().addAll(recentUploadedPosts);

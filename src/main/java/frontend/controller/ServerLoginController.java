@@ -49,9 +49,9 @@ public class ServerLoginController {
     CheckBox rememberCheckBox;
 
     public Uploader uploader = null;
-    Config config = new Config();
+    private Config config;
 
-    public void initialize(){
+    public void initialize() {
         //Set the Protocols in the ComboBox
         protocolComboBox.getItems().addAll(Protocols.FTPS, Protocols.SFTP);
         protocolComboBox.getSelectionModel().select(0);
@@ -77,23 +77,22 @@ public class ServerLoginController {
 
     @FXML
     void loginBtn(ActionEvent event) throws Exception {
-        try{
+        try {
             uploader.disconnect();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             //e.printStackTrace();
         }
-        config.setWorkingDir(uploadpathTextField.getText());
-        config.setServerURL(urlTextField.getText());
-        config.setServerUsername(usernameTextField.getText());
-        config.setServerPassword(passwordPasswordField.getText());
-        config.setPort(Integer.parseInt(portTextField.getText()));
-        config.setProtocol((Protocols) protocolComboBox.getSelectionModel().getSelectedItem());
+        config = new Config();
+        config.setUploadServerWorkingDir(uploadpathTextField.getText());
+        config.setUploadServerURL(urlTextField.getText());
+        config.setUploadServerUsername(usernameTextField.getText());
+        config.setUploadServerPassword(passwordPasswordField.getText());
+        config.setUploadServerPort(Integer.parseInt(portTextField.getText()));
+        config.setUploadProtocol((Protocols) protocolComboBox.getSelectionModel().getSelectedItem());
 
-        try{
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getServerUrl(), config.getPort(), config.getServerUsername(), config.getServerPassword(), config.getWorkingDir());
-        }
-        catch (UploaderException e) {
+        try {
+            uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
+        } catch (UploaderException e) {
             e.printStackTrace();
             new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
         }
@@ -120,7 +119,7 @@ public class ServerLoginController {
     }
 
     @FXML
-    void rememberCheckBox(ActionEvent event){
+    void rememberCheckBox(ActionEvent event) {
 
     }
 

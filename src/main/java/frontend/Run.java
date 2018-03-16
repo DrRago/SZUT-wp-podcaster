@@ -17,7 +17,7 @@ public class Run extends Application{
     private MainController mainController = new MainController();
 	public void start(Stage loginStage) {
                 try {
-                    Parent root = FXMLLoader.load(PathUtil.getResourcePath("Controller/ServerLogin.fxml"));
+                    Parent root = FXMLLoader.load(PathUtil.getResourcePath("Controller/MainGui.fxml"));
 
 
                     //Set the GUI title

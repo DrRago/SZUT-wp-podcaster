@@ -4,6 +4,8 @@ package frontend.controller.testing;
 import backend.LameQueue.LameQueue;
 import backend.MediaFactory.Lame;
 import backend.wordpress.Blog;
+import config.Config;
+import frontend.controller.MainController;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -13,14 +15,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import lombok.Getter;
+import lombok.Setter;
 import util.PathUtil;
 
 import java.io.IOException;
 
 public class MediaQueue {
+
+    @Setter
+    private MainController controller;
 
     @FXML
     protected ListView<Lame> postListView = new ListView<>();
@@ -79,8 +87,9 @@ public class MediaQueue {
     protected final ToggleGroup group = new ToggleGroup();
     public ObservableList<Lame> postList = FXCollections.observableArrayList();
 
-    public void initialize() {
+    Config config = new Config();
 
+    public void initialize() {
         postListView.setCellFactory(lv -> {
             TextFieldListCell<Lame> cell = new TextFieldListCell<>();
             cell.setConverter(new StringConverter<Lame>() {
@@ -159,38 +168,24 @@ public class MediaQueue {
     void closeBtn(ActionEvent event) {
         //TODO: CLOSE PANE
         // get a handle to the stage
-        Stage stage = (Stage) defaultCheckBox.getScene().getWindow();
-        stage.close();
+        controller.closePane();
     }
 
     @FXML
     void uploadPostsBtn(ActionEvent event) throws Exception {
 
-        ServerLoginController serverLoginController = new ServerLoginController();
-        //Uploader uploader = serverLoginController.uploader;
 
-        Blog blog = serverLoginController.blog;
-        LameQueue lameQueue = new LameQueue(blog);
+
+        //ServerLoginController serverLoginController = new ServerLoginController();
+        //Uploader uploader = serverLoginController.uploader;
+        //WpLoginController wpLoginController;
+        //Blog blog = wpLoginController.blog;
+        LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), controller.uploader, config.getRemotePath()));
         for(int i = 0; i<postList.size(); i++) {
             lameQueue.add(postList.get(i));
         }
         lameQueue.startQueue();
 
-        //TODO: Upload
-        /*Config config = new Config();
-        Uploader uploader = null;
-        try {
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir());
-        } catch (UploaderException e) {
-            e.printStackTrace();
-        }
-        Blog blog = null;
-        try {
-            blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressURL(), uploader,config.getWorkingDir());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        LameQueue lameQueue = new LameQueue(blog);*/
     }
 
     @FXML

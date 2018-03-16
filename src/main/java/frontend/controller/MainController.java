@@ -1,10 +1,13 @@
 package frontend.controller;
 
 import backend.fileTransfer.Uploader;
+import backend.fileTransfer.UploaderException;
+import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
 import frontend.controller.testing.LoadFxml;
+import frontend.controller.testing.MediaQueue;
 import frontend.controller.testing.ServerLoginController;
 import frontend.controller.testing.WpLoginController;
 import javafx.collections.FXCollections;
@@ -17,6 +20,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -24,6 +28,7 @@ import javafx.stage.Stage;
 import lombok.Setter;
 import util.PathUtil;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
 import java.util.List;
 
@@ -36,7 +41,7 @@ public class MainController {
     private WpLoginController wpLoginController;
 
     @FXML
-    public TableView tableView;
+    public TableView<MyPost> tableView;
 
     @FXML
     private VBox VBoxEdt;
@@ -57,13 +62,13 @@ public class MainController {
     public static Button btnAddNew;
 
     @FXML
-    TableColumn idColumn;
+    TableColumn<MyPost, Integer> idColumn;
 
     @FXML
-    TableColumn titleColumn;
+    TableColumn<MyPost, String> titleColumn;
 
     @FXML
-    TableColumn authorColumn;
+    TableColumn<MyPost, String> authorColumn;
 
     private Region pane;
     private Blog blog;
@@ -85,12 +90,18 @@ public class MainController {
     private ObservableList tableData = FXCollections.observableArrayList();
     private static Stage stageLogin = new Stage();
 
+
     /**
      * Initialize the main window
      * Set a status bar for progress on upload
      * Load default images
      */
     public void initialize() throws Exception {
+
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("postID"));
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("postTitle"));
+        authorColumn.setCellValueFactory(new PropertyValueFactory<>("postAuthor"));
+
         statusbar.setProgress(0.0);
 /*        try {
             loadPane();
@@ -112,17 +123,11 @@ public class MainController {
             }
         });
 
+        uploader = UploaderFactory.getUploader(config.getProtocol(), config.getServerUrl(), config.getPort(), config.getServerUsername(), config.getServerPassword(), config.getWorkingDir());
+        blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), uploader, config.getRemotePath());
+        List<MyPost> recentUploadedPosts = blog.getPosts();
 
-        //Todo: Posts
-
-        System.out.println(config.getProtocol());
-        System.out.println(config.getHostname());
-        System.out.println(config.getPort());
-        System.out.println(config.getWordpressUsername());
-        System.out.println(config.getWordpressPassword());
-        System.out.println(config.getWorkingDir());
-
-
+        tableView.getItems().addAll(recentUploadedPosts);
     }
 
     public void openLogin(){
@@ -135,14 +140,14 @@ public class MainController {
         }
         stageLogin.setTitle("Login");
         stageLogin.setScene(new Scene(root));
-
+        shutdown();
         stageLogin.show();
     }
 
     public static void shutdown() {
         try {
             uploader.disconnect();
-        } catch (IOException e) {
+        } catch (UploaderException e) {
             e.printStackTrace();
         }
     }
@@ -212,23 +217,20 @@ public class MainController {
      */
     @FXML
     void btnAddNew(ActionEvent event) {
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Podcast.fxml"));
-        Parent root = null;
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaQueue.fxml"));
+        MediaQueue mediaQueueController = null;
         try {
-            root = fxmlLoader.load();
+            pane = fxmlLoader.load();
+            mediaQueueController = fxmlLoader.getController();
+            mediaQueueController.setController(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        PodcastController controller = fxmlLoader.getController();
-        //TODO: WARUM WIRD DAS ROT MAKIERT???? XD
-        controller.setController(this);
-        controller.init();
-        stagePodcast.setTitle("New Podcast");
-        stagePodcast.setScene(new Scene(root));
-
-        stagePodcast.show();
-        stagePodcast.setMinHeight(425);
-        stagePodcast.setMinWidth(600);
+        VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
+        VBoxEdt.setMaxHeight(mainHbox.getMaxHeight());
+        VBoxEdt.setMargin(mainHbox, new Insets(5,5,0,0));
+        VBoxEdt.getChildren().add(pane);
+        pane.setVisible(true);
     }
 
     /**
@@ -321,7 +323,7 @@ public class MainController {
     /**
      * Main method to close the sidepane
      */
-    void closePane() {
+    public void closePane() {
         VBoxEdt.setMargin(mainHbox, new Insets(0,0,0,0));
         VBoxEdt.setMaxWidth(0);
         VBoxEdt.getChildren().remove(pane);

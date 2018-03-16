@@ -113,7 +113,7 @@ public class PodcastController {
         controller.closePodcast();
 
         System.out.println(optionController.getUploader());
-        Blog blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getHostname() , optionController.getUploader(), config.getWorkingDir());
+        //Blog blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getHostname() , optionController.getUploader(), config.getWorkingDir());
 
         ObservableList<Lame> lameItems = mediaDescriptioncontroller.lameItems;
         for(int i = 0; lameItems.size()>i; i++){

@@ -106,6 +106,8 @@ public class MediaToQueue {
 
     private final ToggleGroup group = new ToggleGroup();
 
+    private MediaView mediaView;
+
     private Lame lame = null;
     private File file;
 
@@ -180,6 +182,9 @@ public class MediaToQueue {
         else {
             System.out.println("Fehler");
         }
+        player.stop();
+        player.dispose();
+        //mediaView.setMediaPlayer(null);
     }
 
     @FXML
@@ -239,9 +244,9 @@ public class MediaToQueue {
             titleTextField.setText(lame.getMP3File().getName());
 
             //Create a Media Object so the Data could be played
-            media = new Media(lame.getMP3File().toURI().toString());
+            media = new Media(new File("C:\\Users\\Marius\\02_fabian_roemer_-_blauwalherz.mp3").toURI().toString());
             player = new MediaPlayer(media);
-            MediaView mediaView = new MediaView(player);
+            mediaView = new MediaView(player);
 
             //Hide the Box while loading the File
             playerHbox.setVisible(false);
@@ -280,21 +285,21 @@ public class MediaToQueue {
             });
 
             //If the Slider is moved synchronise the Audio
-            player.currentTimeProperty().addListener(new ChangeListener<Duration>() {
+            /*player.currentTimeProperty().addListener(new ChangeListener<Duration>() {
                 @Override
                 public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration current) {
                     slider.setValue(current.toSeconds());
                 }
-            });
+            });*/
 
             //Synchronise the Slider with the Audio
-            slider.valueProperty().addListener(new ChangeListener<Number>() {
+            /*slider.valueProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                     if (slider.getValue() != player.getCurrentTime().toSeconds())
                         player.seek(Duration.seconds(slider.getValue()));
                 }
-            });
+            });*/
         }
 
     }

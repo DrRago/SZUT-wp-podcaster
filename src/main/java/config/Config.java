@@ -58,6 +58,7 @@ public class Config {
             wordpressURL = prop.getProperty("wordpressURL", "localhost/wordpress");
             serverUrl = prop.getProperty("serverURL", "localhost");
 
+            remotePath = prop.getProperty("remotePath", "/");
             input.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -221,7 +222,7 @@ public class Config {
         setConfigEntry("id3_genre", id3_genre);
     }
 
-    public void saveConfig(String wordpressPassword, String wordpressUrl, String serverPassword, String serverUsername,
+    public void saveConfig(String wordpressPassword, String serverPassword, String serverUsername,
                            String wordpressUsername, String workingDir, String serverUrl, Protocols protocol,
                            String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
                            String id3_year, String id3_comment, String id3_genre, String remotePath) {

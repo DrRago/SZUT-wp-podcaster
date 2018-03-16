@@ -51,7 +51,6 @@ public class ServerLoginController {
 
     public Uploader uploader = null;
     Config config = new Config();
-    public Blog blog;
 
     public void initialize(){
         //Set the Protocols in the ComboBox

@@ -83,7 +83,7 @@ public class OptionController {
     public void saveOptions(ActionEvent e) throws IOException, UploaderException {
 //        if(MainController.uploader != UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir())) MainController.uploader.disconnect();
         if(MainController.uploader != null)MainController.uploader.disconnect();
-        config.saveConfig(
+        /*config.saveConfig(
                 passwdOption.getText(),
                 urlOption.getText(),
                 usrnameOption.getText(),
@@ -96,15 +96,15 @@ public class OptionController {
                 mp3_year.getText(),
                 mp3_comment.getText(),
                 mp3_genre.getText()
-        );
+        );*/
 
         cancelOptions(e);
 
-        try {
+        /*try {
             uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getWordpressUsername(), config.getWordpressPassword(), config.getWorkingDir());
         } catch (UploaderException exception) {
             exception.printStackTrace();
-        }
+        }*/
         if(uploader==null){
             //TODO: Exception!!!!!!!
         }

@@ -145,7 +145,7 @@ public class Lame {
                 Files.move(source, source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"));
             }
             LOGGER.info(String.format("writing file %s", source));
-            Files.move(tmp, source);
+            Files.copy(tmp, source);
         } finally {
             Files.delete(tmp);
         }

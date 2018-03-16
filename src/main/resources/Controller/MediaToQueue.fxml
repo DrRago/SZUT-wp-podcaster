@@ -16,12 +16,12 @@
    <children>
       <HBox maxWidth="1.7976931348623157E308">
          <children>
-            <Label minWidth="65.0" text="Title:">
+            <Label minWidth="65.0" text="Blog Title:">
                <HBox.margin>
                   <Insets top="5.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="titleTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="wpTitleTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
          </children>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -65,7 +65,7 @@
                   <Insets left="5.0" />
                </HBox.margin>
             </RadioButton>
-            <Label minWidth="60.0" text="Upload: ">
+            <Label minWidth="70.0" text="Blog Status:">
                <HBox.margin>
                   <Insets left="50.0" />
                </HBox.margin>
@@ -93,6 +93,19 @@
                   </Label>
                </children>
             </VBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox maxWidth="1.7976931348623157E308">
+         <children>
+            <Label minWidth="65.0" text="Audio Title:">
+               <HBox.margin>
+                  <Insets top="5.0" />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="titleTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
          </children>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

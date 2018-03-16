@@ -27,7 +27,7 @@ public class run {
             lame.executeCommand();
 
             Blog blog = new Blog("admin", "12345", "http://localhost/wp/xmlRpc.php", uploader, "/");
-            blog.addPost("Test", "publish", lame);
+            //blog.addPost("Test", "publish", lame);
             uploader.disconnect();
         } catch (Throwable e) {
             e.printStackTrace();

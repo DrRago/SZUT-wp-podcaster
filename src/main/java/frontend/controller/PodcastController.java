@@ -124,7 +124,7 @@ public class PodcastController {
             lameItems.get(i).setID3_Title(mediaDescriptioncontroller.textFieldTitle.getText());
             lameItems.get(i).setID3_Artist(mediaDescriptioncontroller.textFieldAuthor.getText());
             lameItems.get(i).setID3_Album(mediaDescriptioncontroller.textFieldAlbum.getText());
-            blog.addPost(mediaDescriptioncontroller.textFieldTitle.getText(), mediaDescriptioncontroller.pendingState.getSelectionModel().toString(), mediaDescriptioncontroller.lameItems.get(i));
+            //blog.addPost(mediaDescriptioncontroller.textFieldTitle.getText(), mediaDescriptioncontroller.pendingState.getSelectionModel().toString(), mediaDescriptioncontroller.lameItems.get(i));
         }
     }
 

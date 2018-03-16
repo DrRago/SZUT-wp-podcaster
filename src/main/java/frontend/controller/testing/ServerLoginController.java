@@ -6,6 +6,7 @@ import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import config.Config;
+import frontend.controller.MainController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -20,7 +21,7 @@ import util.PathUtil;
 
 import java.io.IOException;
 
-public class LoginController {
+public class ServerLoginController {
 
     @FXML
     private TextField urlTextField;
@@ -54,9 +55,11 @@ public class LoginController {
     public Blog blog;
 
     public void initialize(){
+        //Set the Protocols in the ComboBox
         protocolComboBox.getItems().addAll(Protocols.FTPS, Protocols.SFTP);
         protocolComboBox.getSelectionModel().select(0);
 
+        //Set the PotTextField to a numeric TextField
         portTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -71,16 +74,17 @@ public class LoginController {
 
     @FXML
     void cancelBtn(ActionEvent event) {
-
+        Stage stage = (Stage) cancelBtn.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
-    void loginBtn(ActionEvent event) {
+    void loginBtn(ActionEvent event) throws Exception {
         try{
-//            uploader.disconnect();
+            uploader.disconnect();
         }
         catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         config.setWorkingDir(uploadpathTextField.getText());
         config.setWordpressURL(urlTextField.getText());
@@ -91,15 +95,14 @@ public class LoginController {
 
         try{
             uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
-            blog = new Blog(config.getUsername(),config.getPassword(),config.getWordpressURL(), uploader,config.getWorkingDir());
         }
-        catch (IOException|UploaderException e) {
+        catch (UploaderException e) {
             e.printStackTrace();
         }
 
         Stage stageMain = new Stage();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MainGui.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/WpLogin.fxml"));
         Parent root = null;
         try {
             root = fxmlLoader.load();
@@ -107,14 +110,13 @@ public class LoginController {
             //e.printStackTrace();
             System.out.println("Cant initialize, because of wrong Login");
         }
-        //MainController controller = new MainController();
-        //controller.setController(this);
         stageMain.setTitle("- Podcaster");
         stageMain.setScene(new Scene(root));
         stageMain.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
 
         stageMain.show();
 
+        cancelBtn(event);
     }
 
     @FXML

@@ -3,14 +3,7 @@ package frontend.controller.testing;
 
 import backend.LameQueue.LameQueue;
 import backend.MediaFactory.Lame;
-import backend.fileTransfer.Uploader;
-import backend.fileTransfer.UploaderException;
-import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
-import com.jcraft.jsch.SftpException;
-import config.Config;
-import frontend.controller.LoadFxml;
-import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -23,18 +16,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import lombok.Setter;
-import net.bican.wordpress.exceptions.InsufficientRightsException;
-import net.bican.wordpress.exceptions.InvalidArgumentsException;
-import net.bican.wordpress.exceptions.ObjectNotFoundException;
-import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 public class MediaQueue {
 
@@ -180,16 +164,17 @@ public class MediaQueue {
     }
 
     @FXML
-    void uploadPostsBtn(ActionEvent event) {
+    void uploadPostsBtn(ActionEvent event) throws Exception {
 
-        LoginController loginController = new LoginController();
-        //Uploader uploader = loginController.uploader;
+        ServerLoginController serverLoginController = new ServerLoginController();
+        //Uploader uploader = serverLoginController.uploader;
 
-        Blog blog = loginController.blog;
+        Blog blog = serverLoginController.blog;
         LameQueue lameQueue = new LameQueue(blog);
         for(int i = 0; i<postList.size(); i++) {
-            lameQueue.add(postList.get(i), postList.get(i).getID3_Title(), "");
+            lameQueue.add(postList.get(i));
         }
+        lameQueue.startQueue();
 
         //TODO: Upload
         /*Config config = new Config();

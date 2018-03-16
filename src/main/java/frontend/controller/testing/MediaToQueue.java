@@ -93,6 +93,9 @@ public class MediaToQueue {
     @FXML
     Label bitRateLabel;
 
+    @FXML
+    TextField wpTitleTextField;
+
     private Config config = new Config();
 
     private Pane pane;
@@ -142,6 +145,8 @@ public class MediaToQueue {
         lame.setID3_Artist(authorTextField.getText());
         lame.setID3_Comment(commentTextArea.getText());
         lame.setID3_ReleaseYear(yearTextField.getText());
+        lame.setWp_status(uploadConfig.getSelectionModel().getSelectedItem());
+        lame.setWp_postTitle(wpTitleTextField.getText());
 
         AudioMode audioMode = null;
         Toggle currentToggle = group.getSelectedToggle();

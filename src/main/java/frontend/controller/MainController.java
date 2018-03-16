@@ -6,6 +6,9 @@ import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
+import frontend.controller.testing.LoadFxml;
+import frontend.controller.testing.ServerLoginController;
+import frontend.controller.testing.WpLoginController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,7 +36,10 @@ import java.util.List;
 public class MainController {
 
     @Setter
-    private InformationController controller;
+    private ServerLoginController serverLoginController;
+
+    @Setter
+    private WpLoginController wpLoginController;
 
     @FXML
     public TableView tableView;
@@ -125,10 +131,6 @@ public class MainController {
             }
         });
 
-        List<MyPost> blogPosts = blog.getPosts();
-        for(int i = 0;i<blogPosts.size();i++){
-            //TODO: Show Posts
-        }
 
         //Todo: Posts
 
@@ -139,32 +141,11 @@ public class MainController {
         System.out.println(config.getPassword());
         System.out.println(config.getWorkingDir());
 
-        /*try {
-            uploader = UploaderFactory.getUploader(config.getProtocol(), config.getHostname(), config.getPort(), config.getUsername(), config.getPassword(), config.getWorkingDir());
-        } catch (UploaderException exception) {
-            //exception.printStackTrace();
-           ShowAlert login = new ShowAlert(ShowAlert.AlertType.INFORMATION, "Can't Login to the URL. Check the configuration, your Username and Password.\n Please try again!");
-            login.setTitle("Can't Login");
-            login.showAndWait();
-            Stage stage = (Stage) tableView.getScene().getWindow();
-            stage.addEventHandler(WindowEvent.WINDOW_SHOWING, new  EventHandler<WindowEvent>()
-            {
-                @Override
-                public void handle(WindowEvent window)
-                {
-                    stage.close();
-                    openLogin();
-                }
-            });
 
-        }*/
-        //Stage stageMain = (Stage) btnAddNew.getScene().getWindow();
-        //stageMain.hide();
-        //openLogin();
     }
 
     public void openLogin(){
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/OldLogin.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/WpLogin.fxml"));
         Parent root = null;
         try {
             root = fxmlLoader.load();
@@ -330,7 +311,7 @@ public class MainController {
      */
     void loadPane() throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Information.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaQueue.fxml"));
         pane = fxmlLoader.load();
         infocontroller = fxmlLoader.getController();
         infocontroller.setController(this);

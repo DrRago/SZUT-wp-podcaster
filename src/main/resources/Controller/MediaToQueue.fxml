@@ -85,7 +85,7 @@
             <Label minWidth="65.0" text="Bitrate:" />
             <VBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                <children>
-                  <Slider fx:id="bitRateSlider" majorTickUnit="32.0" max="320.0" maxWidth="1.7976931348623157E308" min="32.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" VBox.vgrow="ALWAYS" />
+                  <Slider fx:id="bitRateSlider" majorTickUnit="32.0" max="320.0" maxWidth="1.7976931348623157E308" min="32.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" VBox.vgrow="ALWAYS" />
                   <Label fx:id="bitRateLabel" text="--kBit/s">
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

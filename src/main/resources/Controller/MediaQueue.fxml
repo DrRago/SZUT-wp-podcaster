@@ -151,7 +151,7 @@
                               </CheckBox>
                               <VBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Slider fx:id="bitrateSlider" majorTickUnit="32.0" max="320.0" maxWidth="1.7976931348623157E308" min="32.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                                    <Slider fx:id="bitrateSlider" maxWidth="1.7976931348623157E308" blockIncrement="64.0" majorTickUnit="32.0" max="320.0" min="32.0" minorTickCount="0" showTickMarks="true" snapToTicks="true" />
                                     <Label fx:id="bitrateLabel" alignment="BOTTOM_CENTER" text="-- kBit/s" />
                                  </children>
                               </VBox>

@@ -1,10 +1,9 @@
-package frontend.controller.testing;
+package frontend.controller;
 
 import backend.fileTransfer.Protocols;
 import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import backend.fileTransfer.UploaderFactory;
-import backend.wordpress.Blog;
 import config.Config;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

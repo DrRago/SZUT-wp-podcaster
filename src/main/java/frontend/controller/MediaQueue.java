@@ -1,11 +1,10 @@
-package frontend.controller.testing;
+package frontend.controller;
 
 
 import backend.LameQueue.LameQueue;
 import backend.MediaFactory.Lame;
 import backend.wordpress.Blog;
 import config.Config;
-import frontend.controller.MainController;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -15,7 +14,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -83,6 +81,10 @@ public class MediaQueue {
 
     @FXML
     protected ChoiceBox<String> uploadChoiceBox;
+
+    @Getter
+    @Setter
+    private mediaViewSettings mediaViewSettings;
 
     protected final ToggleGroup group = new ToggleGroup();
     public ObservableList<Lame> postList = FXCollections.observableArrayList();
@@ -174,16 +176,19 @@ public class MediaQueue {
     @FXML
     void uploadPostsBtn(ActionEvent event) throws Exception {
 
+        //closeBtn(event);
 
+        //TODO: Close Process for the Media
+        System.out.println(postListView.getItems());
+        System.out.println(postList);
 
-        //ServerLoginController serverLoginController = new ServerLoginController();
-        //Uploader uploader = serverLoginController.uploader;
-        //WpLoginController wpLoginController;
-        //Blog blog = wpLoginController.blog;
         LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressURL(), controller.uploader, config.getRemotePath()));
         for(int i = 0; i<postList.size(); i++) {
             lameQueue.add(postList.get(i));
+            postList.remove(i);
         }
+        postListView.getItems().removeAll(postList);
+        System.out.println(postList);
         lameQueue.startQueue();
 
     }

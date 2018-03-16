@@ -1,4 +1,4 @@
-package frontend.controller.testing;
+package frontend.controller;
 
 import backend.MediaFactory.AudioMode;
 import backend.MediaFactory.Lame;
@@ -102,7 +102,7 @@ public class MediaToQueue {
 
     public Media media;
 
-    public MediaPlayer player;
+    public MediaPlayer player = null;
 
     private final ToggleGroup group = new ToggleGroup();
 
@@ -169,12 +169,6 @@ public class MediaToQueue {
 
         if(lame!=null) {
             controller.postList.add(lame);
-            //controller.postList.addListener(new ListChangeListener<Lame>() {
-            //    @Override
-            //    public void onChanged(Change<? extends Lame> c) {
-            //        controller.postListView.setItems(controller.postList);
-            //    }
-            //});
 
             System.out.println("Drin");
             cancelBtn(event);
@@ -184,7 +178,16 @@ public class MediaToQueue {
         }
         player.stop();
         player.dispose();
+        mediaView.setMediaPlayer(null);
+        media = null;
+        lame.getMP3File().delete();
         //mediaView.setMediaPlayer(null);
+        System.out.println(media);
+        System.out.println(player.getMedia());
+        player = null;
+        System.out.println(player.getMedia());
+
+
     }
 
     @FXML
@@ -244,7 +247,8 @@ public class MediaToQueue {
             titleTextField.setText(lame.getMP3File().getName());
 
             //Create a Media Object so the Data could be played
-            media = new Media(new File("C:\\Users\\Marius\\02_fabian_roemer_-_blauwalherz.mp3").toURI().toString());
+            media = new Media(lame.getMP3File().toURI().toString());
+
             player = new MediaPlayer(media);
             mediaView = new MediaView(player);
 
@@ -285,21 +289,21 @@ public class MediaToQueue {
             });
 
             //If the Slider is moved synchronise the Audio
-            /*player.currentTimeProperty().addListener(new ChangeListener<Duration>() {
+            player.currentTimeProperty().addListener(new ChangeListener<Duration>() {
                 @Override
                 public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration current) {
                     slider.setValue(current.toSeconds());
                 }
-            });*/
+            });
 
             //Synchronise the Slider with the Audio
-            /*slider.valueProperty().addListener(new ChangeListener<Number>() {
+            slider.valueProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                     if (slider.getValue() != player.getCurrentTime().toSeconds())
                         player.seek(Duration.seconds(slider.getValue()));
                 }
-            });*/
+            });
         }
 
     }

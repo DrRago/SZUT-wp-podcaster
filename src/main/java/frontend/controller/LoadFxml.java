@@ -1,4 +1,4 @@
-package frontend.controller.testing;
+package frontend.controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

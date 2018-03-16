@@ -1,9 +1,8 @@
-package frontend.controller.testing;
+package frontend.controller;
 
 import backend.wordpress.Blog;
 import backend.wordpress.WordpressConnectionException;
 import config.Config;
-import frontend.controller.MainController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

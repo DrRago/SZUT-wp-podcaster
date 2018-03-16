@@ -6,10 +6,6 @@ import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
-import frontend.controller.testing.LoadFxml;
-import frontend.controller.testing.MediaQueue;
-import frontend.controller.testing.ServerLoginController;
-import frontend.controller.testing.WpLoginController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,7 +24,6 @@ import javafx.stage.Stage;
 import lombok.Setter;
 import util.PathUtil;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
 import java.util.List;
 

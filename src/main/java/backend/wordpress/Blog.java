@@ -4,6 +4,8 @@ import backend.MediaFactory.Lame;
 import backend.fileTransfer.Uploader;
 import backend.fileTransfer.UploaderException;
 import com.google.common.net.UrlEscapers;
+import lombok.Getter;
+import lombok.Setter;
 import net.bican.wordpress.Post;
 import net.bican.wordpress.Wordpress;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
@@ -18,13 +20,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The interface for the frontend to communicate with wordpress
+ */
 public class Blog {
     private static final Logger LOGGER = Logger.getGlobal();
 
     private Wordpress wp;
+    @Getter
+    @Setter
     private Uploader uploader;
+    @Getter
+    @Setter
     private URL remotePath;
 
+    /**
+     * Instantiates a new Blog.
+     *
+     * @param wp_user     the wordpress user
+     * @param wp_password the wordpress password
+     * @param xmlRpcUrl   the wordpress xml rpc url
+     * @param uploader    the uploader
+     * @param remotePath  the remote path (the web URL to the upload directory e.g. "http://localhost/uploads/"
+     * @throws IOException                  the io exception
+     * @throws WordpressConnectionException the wordpress connection exception
+     */
     public Blog(String wp_user, String wp_password, String xmlRpcUrl, Uploader uploader, String remotePath) throws IOException, WordpressConnectionException {
         this.remotePath = new URL(remotePath);
         wp = new Wordpress(wp_user, wp_password, xmlRpcUrl);
@@ -39,9 +59,18 @@ public class Blog {
     }
 
     private void checkConnection() throws XmlRpcFault, InsufficientRightsException {
+        // simply make a xmlrpc call to check if the connection was successfully established
         wp.getAuthors();
     }
 
+    /**
+     * Get recent posts on the blog and fetch them into a usable data structure for the frontend
+     *
+     * @return the posts
+     * @throws XmlRpcFault                 an xml rpc fault
+     * @throws InsufficientRightsException the insufficient rights exception
+     * @throws ObjectNotFoundException     the object not found exception
+     */
     public List<MyPost> getPosts() throws XmlRpcFault, InsufficientRightsException, ObjectNotFoundException {
         List<Post> postList = wp.getPosts();
         List<MyPost> posts = new ArrayList<>();
@@ -51,17 +80,30 @@ public class Blog {
         return posts;
     }
 
+    /**
+     * Add a post to wordpress and upload the mp3 file.
+     *
+     * @param encoder the lame encoder
+     * @throws InsufficientRightsException the insufficient rights exception
+     * @throws InvalidArgumentsException   the invalid arguments exception
+     * @throws XmlRpcFault                 the xml rpc fault
+     * @throws ObjectNotFoundException     the object not found exception
+     * @throws UploaderException           the uploader exception
+     * @throws IOException                 the io exception
+     */
     public void addPost(Lame encoder) throws InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException, IOException {
         LOGGER.info(String.format("adding post %s as %s", encoder.getWp_postTitle(), encoder.getWp_status()));
         File file = encoder.getMP3File();
         String uploadStatus = uploader.uploadFile(file.getPath());
 
-
+        // check whether ftps ot sftp had an error during uploading
         if (!uploadStatus.startsWith("226") && !uploadStatus.equals("200")) {
             LOGGER.severe(uploadStatus);
             throw new UploaderException(uploadStatus);
         }
 
+        // the content of the post should look like this;
+        // <a href="http://url/to/mp3file">Title of the file</a>
         String mediaLink = UrlEscapers.urlFragmentEscaper().escape(remotePath + file.getName());
         String postcontent = "<a href=\"" + mediaLink + "\">" + encoder.getWp_postTitle() + "</a>";
 
@@ -70,15 +112,8 @@ public class Blog {
         recentPost.setPost_content(postcontent);
         recentPost.setPost_status(encoder.getWp_status());
 
+        // add the post to wordpress
         Integer result = wp.newPost(recentPost);
         LOGGER.info(String.format("Post created with id %d", result));
-    }
-
-    public URL getRemotePath() {
-        return remotePath;
-    }
-
-    public void setRemotePath(URL remotePath) {
-        this.remotePath = remotePath;
     }
 }

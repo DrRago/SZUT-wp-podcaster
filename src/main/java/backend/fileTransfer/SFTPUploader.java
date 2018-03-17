@@ -30,6 +30,7 @@ public class SFTPUploader implements Uploader {
         Channel channel;
 
         try {
+            // create an sftp session and connect to it
             JSch jsch = new JSch();
             session = jsch.getSession(username, hostname, port);
             session.setPassword(password);
@@ -37,10 +38,14 @@ public class SFTPUploader implements Uploader {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.connect();
+
+            // get the channel from the session and connect to it
             channel = session.openChannel("sftp");
             channel.connect();
             sftpChannel = (ChannelSftp) channel;
+
             LOGGER.info(String.format("connected to %s:%d", hostname, port));
+
             setRemotePath(workingDir);
         } catch (JSchException | SftpException e) {
             LOGGER.severe(e.getMessage());
@@ -53,12 +58,23 @@ public class SFTPUploader implements Uploader {
         LOGGER.info(String.format("uploading file \"%s\" to %s", filePath, session.getHost()));
         File f = new File(filePath);
         try {
+            // store the file on the server
             sftpChannel.put(new FileInputStream(f), f.getName());
         } catch (SftpException e) {
             throw new UploaderException(e);
         }
         LOGGER.info("upload successful");
         return "200";
+    }
+
+    /**
+     * Checks whether the connection is still active or not
+     *
+     * @return the response if the connection is active or not
+     */
+    @Override
+    public boolean isConnected() {
+        return sftpChannel.isConnected();
     }
 
     private void setRemotePath(String path) throws SftpException {

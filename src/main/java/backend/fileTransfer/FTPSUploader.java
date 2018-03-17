@@ -16,7 +16,7 @@ public class FTPSUploader implements Uploader {
     private static final Logger LOGGER = Logger.getGlobal();
 
     private FTPSClient client = new FTPSClient(true);
-    private String remote;
+    private String workingDir;
 
     /**
      * Instantiates a new Ftps uploader.
@@ -28,12 +28,14 @@ public class FTPSUploader implements Uploader {
      * @param workingDir the working dir the files should be uploaded to
      * @throws UploaderException the exception if any errors occur during connecting
      */
-    public FTPSUploader(String hostname, int port, String username, String password, String workingDir) throws UploaderException {
+    FTPSUploader(String hostname, int port, String username, String password, String workingDir) throws UploaderException {
         try {
+            // try to connect and login to ftps server
             client.connect(hostname, port);
             LOGGER.info(String.format("connected to %s:%d", hostname, port));
             client.login(username, password);
             if (client.getReplyCode() != 230) {
+                // reply code should be 230 (User logged in, proceed)
                 LOGGER.severe(client.getReplyString().trim());
                 throw new UploaderException(client.getReplyString().trim());
             } else {
@@ -45,10 +47,11 @@ public class FTPSUploader implements Uploader {
             LOGGER.severe(e.getLocalizedMessage());
             throw new UploaderException(e);
         }
+        // enter passive mode, the client establishes command and data channel and the server tells the client the ports to use
         client.enterLocalPassiveMode();
         LOGGER.info(client.getReplyString().trim());
 
-        remote = workingDir;
+        this.workingDir = workingDir;
     }
 
 
@@ -61,17 +64,17 @@ public class FTPSUploader implements Uploader {
             throw new UploaderException(new FileNotFoundException("File " + filePath + " not found"));
         }
 
-        // Create an InputStream of the file to be uploaded
         FileInputStream fis;
         try {
+            // Create an InputStream of the file to be uploaded
             fis = new FileInputStream(file);
+
             // Store file to server
             String uploadPath;
-
-            if (remote.charAt(remote.length()-1) == '/') {
-                uploadPath = remote + file.getName();
+            if (workingDir.charAt(workingDir.length() - 1) == '/') {
+                uploadPath = workingDir + file.getName();
             } else {
-                uploadPath = remote + "/" + file.getName();
+                uploadPath = workingDir + "/" + file.getName();
             }
             client.storeFile(uploadPath, fis);
 
@@ -82,6 +85,16 @@ public class FTPSUploader implements Uploader {
         }
         LOGGER.info(client.getReplyString().trim());
         return client.getReplyString().trim();
+    }
+
+    /**
+     * Checks whether the connection is still active or not
+     *
+     * @return the response if the connection is active or not
+     */
+    @Override
+    public boolean isConnected() {
+        return client.isConnected();
     }
 
     @Override

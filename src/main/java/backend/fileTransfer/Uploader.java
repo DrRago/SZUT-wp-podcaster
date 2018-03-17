@@ -17,6 +17,12 @@ public interface Uploader {
     String uploadFile(String filePath) throws IOException, UploaderException;
 
     /**
+     * Checks whether the connection is still active or not
+     * @return the response if the connection is active or not
+     */
+    boolean isConnected();
+
+    /**
      * Disconnect from the server.
      *
      * @throws UploaderException threw if an error occurs during disconnect

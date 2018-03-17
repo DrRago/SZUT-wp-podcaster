@@ -30,7 +30,7 @@ public class LameQueue extends ArrayList<Lame> {
 
     /**
      * Start the queue.
-     * It automatically iterates over every Lame object in itself, starts te encoding and adds a new post to the blog.
+     * It iterates over every Lame object in itself, starts the encoding and adds a new post to the blog.
      *
      * @throws IOException                 the io exception
      * @throws EncodingAlgorithmException  the encoding algorithm exception

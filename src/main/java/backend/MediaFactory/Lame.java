@@ -36,7 +36,7 @@ public class Lame {
     private String wp_postTitle;
     @Getter
     @Setter
-    private String wp_status;
+    private String wp_status = "publish";
 
     /**
      * Instantiates a new Lame.
@@ -46,6 +46,7 @@ public class Lame {
      * @throws TagException the tag exception
      */
     public Lame(String file) throws IOException, TagException {
+        // figure out what command should be used to start the encoding with lame
         String command;
         if (SystemUtils.IS_OS_WINDOWS) {
             command = PathUtil.getResourcePath("LAME/lame.exe").getPath();
@@ -61,22 +62,29 @@ public class Lame {
             throw new FileNotFoundException(String.format("MP3 \"%s\" could not be found", file));
         }
         ID3TagUtil = new ID3TagUtil(file);
+        // TODO: 17/03/2018 change bitrate
         bitrate = ID3TagUtil.getBitrate();
+        wp_postTitle = ID3TagUtil.getID3_Title();
         checkCommand();
     }
 
     private void checkCommand() throws IOException {
+        // validates the given command for the local os
         LOGGER.info("checking whether lame exists");
         if (SystemUtils.IS_OS_WINDOWS) {
+            // for windows there should exist the lame.exe in the resource folder
             if (!new File(command).exists()) {
                 LOGGER.severe("lame not found on this machine");
                 throw new FileNotFoundException(String.format("Lame not found in internal resources (\"%s\"). Please download lame manually", command));
             }
         } else {
+            // for all other operating systems there should be a lame command, otherwise lame doesn't exist
             ProcessBuilder pb = new ProcessBuilder("command -v" + command);
             pb.redirectErrorStream(true);
             Process p = pb.start();
 
+            // check whether process builder returns the command name, or not.
+            // if not, the command doesn't exist
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
             String line;
             line = reader.readLine();
@@ -97,13 +105,14 @@ public class Lame {
      */
     public void executeCommand() throws IOException, EncodingAlgorithmException {
         Path source = ID3TagUtil.getFile().toPath();
-
+        // create a temporary file the encoded mp3 should be stored in the meantime
         Path tmp = Files.createTempFile(ID3TagUtil.getFile().getName(), ".tmp");
 
         LOGGER.info(String.format("encoding file %s", source));
         try {
+            // create a list of all necessary commands. View lame documentation for further information
+            // https://svn.code.sf.net/p/lame/svn/trunk/lame/USAGE
             List<String> commandList = new ArrayList<>();
-
             commandList.add(command);
             commandList.add("--mp3input");
             commandList.addAll(Arrays.asList("--abr", String.valueOf(bitrate)));
@@ -116,7 +125,9 @@ public class Lame {
             commandList.addAll(Arrays.asList("-m", audioMode.getParam()));
             commandList.add("--add-id3v2");
             commandList.addAll(Arrays.asList("--silent", "-q", "0"));
+            // file to read
             commandList.add("\"" + source + "\"");
+            // file to write to (doesn't need to exist already)
             commandList.add("\"" + tmp + "\"");
 
             LOGGER.info(String.format("executing command %s", StringUtils.join(commandList, " ")));
@@ -134,11 +145,13 @@ public class Lame {
                 builder.append(System.getProperty("line.separator"));
             }
 
+            // encoding failed if lame doesn't return something
             if (!builder.toString().trim().equals("")) {
                 LOGGER.severe("encoding failed");
                 throw new EncodingAlgorithmException(builder.toString());
             }
             LOGGER.info(String.format("backing up %s", source));
+            // saving a backup of the original file with a new name
             if (Files.exists(source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"))) {
                 LOGGER.info("file %s already backed up. Skipping backup and removing old file...");
                 Files.delete(source);
@@ -146,8 +159,10 @@ public class Lame {
                 Files.move(source, source.resolveSibling(ID3TagUtil.getFile().getName() + ".old"));
             }
             LOGGER.info(String.format("writing file %s", source));
+            // copy the temporary file to the actual file location
             Files.copy(tmp, source);
         } finally {
+            // clean up the temp directory
             Files.delete(tmp);
         }
         LOGGER.info(String.format("file %s was successfully encoded", source));

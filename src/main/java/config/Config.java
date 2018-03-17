@@ -84,6 +84,7 @@ public class Config {
             return;
         }
         try {
+            // write an option to the config file
             OutputStream output = new FileOutputStream(configFilePath);
             prop.setProperty(key, value);
             prop.store(output, null);

@@ -225,11 +225,15 @@ public class MainController {
     void btnRemove(ActionEvent event) throws InsufficientRightsException, XmlRpcFault, ObjectNotFoundException {
         closePane();
         int deleteID = tableView.getSelectionModel().getSelectedItem().getPostID();
-        if (blog.deletePost(deleteID)) {
-            new ShowAlert(Alert.AlertType.INFORMATION, String.format("Post %d was successfully moved to bin. You can undo this action by logging in on wordpress", deleteID), "Success", "Deletion successful");
-            tableView.getItems().remove(tableView.getSelectionModel().getFocusedIndex());
-        } else {
-            new ShowAlert(Alert.AlertType.ERROR, String.format("Post %d wasn't successfully moved to bin. The data might be not exist anymore, please reload the table", deleteID), "Error", "Deletion failure");
+        try {
+            if (blog.deletePost(deleteID)) {
+                new ShowAlert(Alert.AlertType.INFORMATION, String.format("Post %d was successfully moved to bin. You can undo this action by logging in on wordpress", deleteID), "Success", "Deletion successful");
+                tableView.getItems().remove(tableView.getSelectionModel().getFocusedIndex());
+            } else {
+                new ShowAlert(Alert.AlertType.ERROR, String.format("Post %d wasn't successfully moved to bin. The data might not exist anymore, please reload the table", deleteID), "Error", "Deletion failure");
+            }
+        } catch (ObjectNotFoundException e) {
+            new ShowAlert(Alert.AlertType.ERROR, String.format("Post %d wasn't successfully moved to bin. The data might not exist anymore, please reload the table", deleteID), "Error", "Deletion failure");
         }
     }
 

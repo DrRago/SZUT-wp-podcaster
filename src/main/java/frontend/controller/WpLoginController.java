@@ -59,14 +59,14 @@ public class WpLoginController {
     public void initialize() throws IOException {
 //        try {
         //    loadingScreen.start(new Stage(StageStyle.UNDECORATED));
-      //      LoadingScreen.launch();
-    //    } catch (Exception e) {
-  //          e.printStackTrace();
+        //      LoadingScreen.launch();
+        //    } catch (Exception e) {
+        //          e.printStackTrace();
 //        }
         config = new Config();
 
         //Remember true
-        if(config.getWpRemember()){
+        if (config.getWpRemember()) {
             usernameTextField.setText(config.getWordpressUsername());
             passwordTextField.setText(config.getWordpressPassword());
             remotePathTextField.setText(config.getRemoteServerPath());
@@ -82,45 +82,46 @@ public class WpLoginController {
 
     @FXML
     void loginButton(ActionEvent event) {
-        try {
+        ObservableList<String> errorMsg = FXCollections.observableArrayList();
+        if (!urlTextField.getText().isEmpty()) {
+            config.setWordpressXmlrpcUrl(urlTextField.getText());
+        }else{
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("URL");
+            }
+        }
+        if (!usernameTextField.getText().isEmpty()) {
+            config.setWordpressUsername(usernameTextField.getText());
+        }else{
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Username");
+            } else {
+                errorMsg.add(" / Username");
+            }
+        }
+        if (!passwordTextField.getText().isEmpty()) {
+            config.setWordpressPassword(passwordTextField.getText());
+        } else{
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Password");
+            } else {
+                errorMsg.add(" / Password");
+            }
+        }
+        if (!remotePathTextField.getText().isEmpty()) {
+            config.setRemoteServerPath(remotePathTextField.getText());
+        }else{
+            if (errorMsg.isEmpty()) {
+                errorMsg.add("Remote Path");
+            } else {
+                errorMsg.add(" / Remote Path");
+            }
+        }
+        if (passwordTextField.getText().isEmpty() || usernameTextField.getText().isEmpty() || urlTextField.getText().isEmpty() || remotePathTextField.getText().isEmpty()) {
+            new ShowAlert("Couldn't Login to WordPress. Please check " + errorMsg.toString().replace("[","").replace("]","") + "!", "Coudln't Login!");
+        } else {
+            try {
 
-
-            ObservableList<String> errorMsg = FXCollections.observableArrayList();
-            if(urlTextField.getText()!=null){
-                config.setWordpressXmlrpcUrl(urlTextField.getText());
-                if(errorMsg.isEmpty()) {
-                    errorMsg.add("URL");
-                }
-            }
-            if(usernameTextField.getText()!=null){
-                config.setWordpressUsername(usernameTextField.getText());
-                if(errorMsg.isEmpty()) {
-                    errorMsg.add("Username");
-                }else{
-                    errorMsg.add("/ Username");
-                }
-            }
-            if(passwordTextField.getText()!=null){
-                config.setWordpressPassword(passwordTextField.getText());
-                if(errorMsg.isEmpty()) {
-                    errorMsg.add("Password");
-                }else{
-                    errorMsg.add("/ Password");
-                }
-            }
-            if(remotePathTextField.getText()!=null){
-                config.setRemoteServerPath(remotePathTextField.getText());
-                if(errorMsg.isEmpty()) {
-                    errorMsg.add("Remote Path");
-                }else{
-                    errorMsg.add("/ Remote Path");
-                }
-            }
-            if(config.getWordpressPassword()== null|| config.getWordpressUsername()== null || config.getWordpressXmlrpcUrl() == null || config.getRemoteServerPath() == null){
-                new ShowAlert("Couldn't Login to WordPress. Please check"+errorMsg+"!","Coudln't Login!");
-            }
-            else {
-                cancelButton(event);
 
                 //Loading Stage
                 /*Stage stage = new Stage(StageStyle.UNDECORATED);
@@ -145,17 +146,17 @@ public class WpLoginController {
                 openMain();
                 //loadingController.closeLoading();
                 cancelButton(event);
-            }
-        } catch (WordpressConnectionException |UploaderException| IOException e) {
-            e.printStackTrace();
+            } catch (WordpressConnectionException | UploaderException | IOException e) {
+                e.printStackTrace();
 
-            new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
+                new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
+            }
         }
     }
 
     @FXML
-    void remember(ActionEvent event){
-        if(remember.isSelected()){
+    void remember(ActionEvent event) {
+        if (remember.isSelected()) {
             config.setWpRemember(true);
         } else {
             config.setWpRemember(false);

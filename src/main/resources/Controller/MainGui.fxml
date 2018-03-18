@@ -25,28 +25,13 @@
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#menuNew" text="New Podcast" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#menuSettings" text="Options">
-                            <graphic>
-                                <ImageView fitHeight="20.0" fitWidth="20.0">
-                                    <image>
-                                        <Image url="@../icons/setting-icon.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#menuNew" text="Add new Posts" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Quit" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Select All">
-                        </MenuItem>
-                        <MenuItem mnemonicParsing="false" text="Deselect All">
-                        </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#menuRemove" text="Remove">
                             <graphic>
                                 <ImageView fitHeight="20.0" fitWidth="20.0">
@@ -68,22 +53,36 @@
             <children>
                 <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Button fx:id="btnAddNew" mnemonicParsing="false" onAction="#btnAddNew" text="Add New Posts">
-                            <graphic>
-                                <HBox>
-                                    <children>
-                                        <ImageView fitHeight="20.0" fitWidth="20.0">
-                                            <image>
-                                                <Image url="@../icons/plus-icon.png" />
-                                            </image>
-                                        </ImageView>
-                                    </children>
-                                </HBox>
-                            </graphic>
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin>
+                  <HBox>
+                     <children>
+                              <Button fx:id="btnAddNew" mnemonicParsing="false" onAction="#btnAddNew" text="Add New Posts">
+                                  <graphic>
+                                      <HBox>
+                                          <children>
+                                              <ImageView fitHeight="20.0" fitWidth="20.0">
+                                                  <image>
+                                                      <Image url="@../icons/plus-icon.png" />
+                                                  </image>
+                                              </ImageView>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                              </Button>
+                        <AnchorPane maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#refreshTableView" text="Refresh Table">
+                           <graphic>
+                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                               <image>
+                                   <Image url="@../icons/refresh-icon.png" />
+                               </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </HBox>
                         <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID">
@@ -102,7 +101,7 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" fillHeight="false" prefWidth="200.0">
                             <children>
-                        <Button maxWidth="1.7976931348623157E308" minWidth="200.0" mnemonicParsing="false" onAction="#logoutBtn" text="Logout">
+                        <Button maxWidth="1.7976931348623157E308" minWidth="200.0" mnemonicParsing="false" onAction="#logoutBtn" text="Logout from WordPress">
                            <graphic>
                               <ImageView disable="true" fitHeight="20.0" fitWidth="20.0">
                                  <image>
@@ -117,19 +116,22 @@
                               <Insets left="5.0" />
                            </HBox.margin>
                         </Button>
+                        <Button maxWidth="1.7976931348623157E308" minWidth="200.0" mnemonicParsing="false" onAction="#changeUploadBtn" text="Change Upload Server">
+                           <graphic>
+                              <ImageView disable="true" fitHeight="20.0" fitWidth="30.0">
+                                 <image>
+                                    <Image url="@../icons/upload-icon.png" />
+                                 </image>
+                                 <viewport>
+                                    <Rectangle2D />
+                                 </viewport>
+                              </ImageView>
+                           </graphic>
+                           <HBox.margin>
+                              <Insets left="4.0" />
+                           </HBox.margin>
+                        </Button>
                         <AnchorPane HBox.hgrow="ALWAYS" />
-                                <Button id="toggl" fx:id="btnSettings" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#settingAction" text="Settings">
-                                    <graphic>
-                                        <ImageView disable="true" fitHeight="20.0" fitWidth="20.0">
-                                            <image>
-                                                <Image url="@../icons/setting-icon.png" />
-                                            </image>
-                                            <viewport>
-                                                <Rectangle2D />
-                                            </viewport>
-                                        </ImageView>
-                                    </graphic>
-                                </Button>
                                 <Button mnemonicParsing="false" onAction="#btnRemove" text="Remove Post">
                                     <graphic>
                                         <ImageView disable="true" fitHeight="20.0" fitWidth="20.0">

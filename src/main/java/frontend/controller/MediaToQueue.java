@@ -192,6 +192,7 @@ public class MediaToQueue {
 
     @FXML
     void selectMediaBtn(ActionEvent event) throws IOException, TagException {
+        if(player != null)player.stop();
 
         //Check if default Arguments are set and show them in the TextFields
         if(controller.authorCheckBox.selectedProperty().getValue()){

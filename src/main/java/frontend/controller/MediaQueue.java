@@ -2,12 +2,18 @@ package frontend.controller;
 
 
 import backend.LameQueue.LameQueue;
+import backend.MediaFactory.EncodingException;
 import backend.MediaFactory.Lame;
+import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
+import com.sun.xml.internal.org.jvnet.fastinfoset.EncodingAlgorithmException;
 import config.Config;
+import frontend.LoadingScreen;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,9 +25,15 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.Setter;
+import net.bican.wordpress.exceptions.InsufficientRightsException;
+import net.bican.wordpress.exceptions.InvalidArgumentsException;
+import net.bican.wordpress.exceptions.ObjectNotFoundException;
+import redstone.xmlrpc.XmlRpcException;
+import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class MediaQueue {
 
@@ -90,6 +102,7 @@ public class MediaQueue {
     public ObservableList<Lame> postList = FXCollections.observableArrayList();
 
     Config config;
+    private int message;
 
     public void initialize() {
         postListView.setCellFactory(lv -> {
@@ -107,7 +120,7 @@ public class MediaQueue {
                     return null;
                 }
             });
-            return cell ;
+            return cell;
         });
 
         ObservableList<String> options =
@@ -180,13 +193,40 @@ public class MediaQueue {
 
         //TODO: Close Process for the Media
         config = new Config();
-        LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath()));
-        for(int i = 0; i<postList.size(); i++) {
+        LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath()));
+        for (int i = 0; i < postList.size(); i++) {
             lameQueue.add(postList.get(i));
             postList.remove(i);
         }
-        lameQueue.startQueue();
+        writeToActivityLog(lameQueue);
+
     }
+
+    public void writeToActivityLog(LameQueue lameQueue){
+
+        class ThreadedTask implements Runnable {
+
+            private final LameQueue lameQueue;
+
+            public ThreadedTask(LameQueue lameQueue) {
+                this.lameQueue = lameQueue;
+            }
+
+            @Override
+            public void run() {
+                try{
+                    lameQueue.startQueue();
+                } catch(NullPointerException|IOException|ObjectNotFoundException|XmlRpcException|InvalidArgumentsException|InsufficientRightsException|UploaderException|XmlRpcFault|EncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        ThreadedTask thread = new ThreadedTask(lameQueue);
+        Platform.runLater(thread);
+
+    }
+
 
     @FXML
     void albumCheckBox(ActionEvent event) {
@@ -290,7 +330,7 @@ public class MediaQueue {
     private void changeDefaultCheckBox() {
         if (!authorCheckBox.selectedProperty().getValue() || !albumCheckBox.selectedProperty().getValue() ||
                 !yearCheckBox.selectedProperty().getValue() || !genreCheckBox.selectedProperty().getValue() ||
-                !bitrateCheckbox.selectedProperty().getValue()|| !decodeCheckBox.selectedProperty().getValue()||
+                !bitrateCheckbox.selectedProperty().getValue() || !decodeCheckBox.selectedProperty().getValue() ||
                 !uploadCheckBox.selectedProperty().getValue()) {
             defaultCheckBox.selectedProperty().setValue(false);
         } else if (authorCheckBox.isSelected() && albumCheckBox.isSelected() &&

@@ -77,6 +77,7 @@ public class ServerLoginController {
 
         //Remember true
         if (config.getServerRemember()) {
+            rememberCheckBox.selectedProperty().setValue(true);
             usernameTextField.setText(config.getUploadServerUsername());
             passwordPasswordField.setText(config.getUploadServerPassword());
             portTextField.setText(String.valueOf(config.getUploadServerPort()));
@@ -84,7 +85,7 @@ public class ServerLoginController {
             uploadpathTextField.setText(config.getUploadServerWorkingDir());
             urlTextField.setText(config.getUploadServerUrl());
         } else {
-
+            config.deleteServerConfig();
         }
     }
 
@@ -106,12 +107,14 @@ public class ServerLoginController {
         ObservableList<String> errorMsg = FXCollections.observableArrayList();
         if (!urlTextField.getText().isEmpty()) {
             config.setUploadServerURL(urlTextField.getText());
+        }else{
             if (errorMsg.isEmpty()) {
                 errorMsg.add("URL");
             }
         }
         if (!usernameTextField.getText().isEmpty()) {
             config.setUploadServerUsername(usernameTextField.getText());
+        }else{
             if (errorMsg.isEmpty()) {
                 errorMsg.add("Username");
             } else {
@@ -120,6 +123,7 @@ public class ServerLoginController {
         }
         if (!passwordPasswordField.getText().isEmpty()) {
             config.setUploadServerPassword(passwordPasswordField.getText());
+        }else{
             if (errorMsg.isEmpty()) {
                 errorMsg.add("Password");
             } else {
@@ -128,6 +132,7 @@ public class ServerLoginController {
         }
         if (!uploadpathTextField.getText().isEmpty()) {
             config.setUploadServerWorkingDir(uploadpathTextField.getText());
+        }else{
             if (errorMsg.isEmpty()) {
                 errorMsg.add("Upload Path");
             } else {
@@ -136,6 +141,7 @@ public class ServerLoginController {
         }
         if (!portTextField.getText().isEmpty()) {
             config.setUploadServerPort(Integer.parseInt(portTextField.getText()));
+        }else{
             if (errorMsg.isEmpty()) {
                 errorMsg.add("Port");
             } else {
@@ -144,12 +150,16 @@ public class ServerLoginController {
         }
         config.setUploadProtocol((Protocols) protocolComboBox.getSelectionModel().getSelectedItem());
 
+        if (passwordPasswordField.getText().isEmpty() || usernameTextField.getText().isEmpty() || urlTextField.getText().isEmpty() || portTextField.getText().isEmpty() ||uploadpathTextField.getText().isEmpty()) {
+            new ShowAlert("Couldn't Login to WordPress. Please check " + errorMsg.toString().replace("[","").replace("]","") + "!", "Coudln't Login!");
+        } else {
 
-        try {
-            uploader = UploaderFactory.getUploader((Protocols) protocolComboBox.getSelectionModel().getSelectedItem(), urlTextField.getText(), Integer.parseInt(portTextField.getText()), usernameTextField.getText(), passwordPasswordField.getText(), uploadpathTextField.getText());
-        } catch (UploaderException e) {
-            e.printStackTrace();
-            new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
+            try {
+                uploader = UploaderFactory.getUploader((Protocols) protocolComboBox.getSelectionModel().getSelectedItem(), urlTextField.getText(), Integer.parseInt(portTextField.getText()), usernameTextField.getText(), passwordPasswordField.getText(), uploadpathTextField.getText());
+            } catch (UploaderException e) {
+                e.printStackTrace();
+                new ShowAlert("Couldn't Login to WordPress. Please check Arguments!", "Couldn't Login");
+            }
         }
 
 
@@ -176,6 +186,11 @@ public class ServerLoginController {
 
     @FXML
     void rememberCheckBox(ActionEvent event) {
-
+        if (rememberCheckBox.isSelected()) {
+            config.setWpRemember(true);
+        } else {
+            config.setWpRemember(false);
+        }
     }
+    //TODO: OPTION NEW SERVER; CHECK FOR CONNECTION; REMEMBER ME BUGFIXING; FREEZING GUI; LOADING SCREEN
 }

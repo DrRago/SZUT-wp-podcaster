@@ -57,7 +57,7 @@ public class MainController {
     public HBox mainHbox;
 
     @FXML
-    private ProgressBar statusbar;
+    public ProgressBar statusbar;
 
     @FXML
     public static Button btnAddNew;
@@ -93,6 +93,7 @@ public class MainController {
      * Load default images
      */
     public void initialize() throws Exception {
+        loadPane();
         config = new Config();
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("postID"));
@@ -162,18 +163,8 @@ public class MainController {
      * @param event
      */
     @FXML
-    void menuNew(ActionEvent event) {
+    void menuNew(ActionEvent event) throws IOException {
         btnAddNew(event);
-    }
-
-    /**
-     * Access the Settings-Window through the menubar
-     *
-     * @param event
-     */
-    @FXML
-    void menuSettings(ActionEvent event) {
-        openSetting();
     }
 
     /**
@@ -212,36 +203,15 @@ public class MainController {
     }
 
     /**
-     * Open the settings window through the button
-     *
-     * @param event
-     */
-    @FXML
-    void settingAction(ActionEvent event) {
-        openSetting();
-    }
-
-    /**
      * Add a new entry through the button
      *
      * @param event
      */
     @FXML
-    void btnAddNew(ActionEvent event) {
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaQueue.fxml"));
-        MediaQueue mediaQueueController = null;
-        try {
-            pane = fxmlLoader.load();
-            mediaQueueController = fxmlLoader.getController();
-            mediaQueueController.setController(this);
-        } catch (IOException e) {
-            e.printStackTrace();
+    void btnAddNew(ActionEvent event) throws IOException {
+        if(!pane.isVisible()) {
+            openPane();
         }
-        VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
-        VBoxEdt.setMaxHeight(mainHbox.getMaxHeight());
-        VBoxEdt.setMargin(mainHbox, new Insets(5, 5, 0, 0));
-        VBoxEdt.getChildren().add(pane);
-        pane.setVisible(true);
     }
 
     /**
@@ -262,35 +232,33 @@ public class MainController {
     }
 
     @FXML
-    void logoutBtn(ActionEvent event) {
+    void logoutBtn(ActionEvent event){
+            closeMainWindow();
+            new LoadFxml("Controller/WpLogin.fxml","Login to WordPress", new Stage());
+    }
+
+    @FXML
+    void changeUploadBtn(ActionEvent event){
         try {
             uploader.disconnect();
         } catch (UploaderException e) {
             e.printStackTrace();
         }
+        closeMainWindow();
+        new LoadFxml("Controller/ServerLogin.fxml","Change Server", new Stage());
+    }
+
+    void closeMainWindow(){
+        Stage stage = (Stage)tableView.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
+    public void refreshTableView(ActionEvent event) {
     }
 
     public void updatePosts(List<MyPost> posts) {
         tableView.setItems((ObservableList) posts);
-    }
-
-
-    /**
-     * Main method to initialize and open the settings window
-     */
-    void openSetting() {
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/Option.fxml"));
-        Parent root = null;
-        try {
-            root = fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        OptionController controller = fxmlLoader.getController();
-        controller.setController(this);
-        stageSettings.setTitle("WP-Podcaster - Option");
-        stageSettings.setScene(new Scene(root));
-        stageSettings.show();
     }
 
     /**
@@ -302,12 +270,8 @@ public class MainController {
 
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaQueue.fxml"));
         pane = fxmlLoader.load();
-        // Create new Anchor Pane for the SidePane
-
-        //EditPane.setMaxWidth(pane.getMaxWidth());
-
-        // Hide the new Anchor Pane for the SidePane
-        //pane.setMinHeight(VBoxEdt.getMaxHeight());
+        MediaQueue mediaQueueController = fxmlLoader.getController();
+        mediaQueueController.setController(this);
 
         pane.setVisible(false);
     }

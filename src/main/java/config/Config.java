@@ -1,6 +1,7 @@
 package config;
 
 import backend.fileTransfer.Protocols;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Getter;
 
 import java.io.*;
@@ -36,10 +37,18 @@ public class Config {
     private String id3_year;
     private String id3_comment;
     private String id3_genre;
+    private String id3_album;
     private int mp3_bitrate;
+    private String decodeProperty;
+    private String uploadStatus;
 
     private Boolean wpRemember;
     private Boolean serverRemember;
+
+    private Boolean serverReLoggingIn;
+    private Boolean wpReLoggingIn;
+
+
 
     /**
      * Instantiates a new Config.
@@ -67,18 +76,29 @@ public class Config {
 
         remoteServerPath = prop.getProperty("remoteServerPath", "http://localhost/uploads");
 
-        id3_title = prop.getProperty("id3_title", "title");
-        id3_artist = prop.getProperty("id3_artist", "artist");
-        id3_year = prop.getProperty("id3_year", "1337");
-        id3_comment = prop.getProperty("id3_comment", "comment");
-        id3_genre = prop.getProperty("id3_genre", "genre");
+        id3_title = prop.getProperty("id3_title", "");
+        id3_artist = prop.getProperty("id3_artist", "");
+        id3_year = prop.getProperty("id3_year", "");
+        id3_comment = prop.getProperty("id3_comment", "");
+        id3_genre = prop.getProperty("id3_genre", "");
+        id3_album = prop.getProperty("id3_album", "");
+        decodeProperty = prop.getProperty("id3_decodeProperty", "");
         mp3_bitrate = Integer.parseInt(prop.getProperty("mp3_bitrate", "320"));
+        uploadStatus = prop.getProperty("uploadStatus", "publish");
 
         wpRemember = Boolean.valueOf(prop.getProperty("wpRemember", "false"));
         serverRemember = Boolean.valueOf(prop.getProperty("serverRemember", "false"));
+
+        serverReLoggingIn = Boolean.valueOf(prop.getProperty("serverReLoggingIn", "false"));
+        wpReLoggingIn = Boolean.valueOf(prop.getProperty("wpReLoggingIn", "false"));
         input.close();
     }
 
+    /**
+     * Set the Config Entry
+     * @param key
+     * @param value
+     */
     private void setConfigEntry(String key, String value) {
         if (value.isEmpty()) {
             return;
@@ -226,6 +246,16 @@ public class Config {
     }
 
     /**
+     * Sets Album
+     *
+     * @param id3_album the album
+     */
+    public void setId3_album(String id3_album){
+        this.id3_album = id3_album;
+        setConfigEntry("id3_album", id3_album);
+    }
+
+    /**
      * Sets id 3 title.
      *
      * @param id3_title the id 3 title
@@ -276,61 +306,65 @@ public class Config {
     }
 
     /**
-     * Save config.
+     * Set decode
      *
-     * @param wordpressPassword      the wordpress password
-     * @param uploadServerPassword   the upload server password
-     * @param uploadServerUsername   the upload server username
-     * @param wordpressUsername      the wordpress username
-     * @param uploadServerWorkingDir the upload server working dir
-     * @param uploadServerUrl        the upload server url
-     * @param uploadProtocol         the upload protocol
-     * @param wordpressURL           the wordpress url
-     * @param mp3_bitrate            the mp3 bitrate
-     * @param id3_title              the id3 title
-     * @param id3_artist             the id3 artist
-     * @param id3_year               the id3 year
-     * @param id3_comment            the id3 comment
-     * @param id3_genre              the id3 genre
-     * @param remoteServerPath       the remote server path
+     * @param decodeProperty the decode Type
      */
-    public void saveConfig(String wordpressPassword, String uploadServerPassword, String uploadServerUsername,
-                           String wordpressUsername, String uploadServerWorkingDir, String uploadServerUrl, Protocols uploadProtocol,
-                           String wordpressURL, int mp3_bitrate, String id3_title, String id3_artist,
-                           String id3_year, String id3_comment, String id3_genre, String remoteServerPath, Boolean wpRemember, Boolean serverRemember) {
-        this.setWordpressPassword(wordpressPassword);
-        this.setRemoteServerPath(remoteServerPath);
-        this.setWordpressXmlrpcUrl(wordpressURL);
-        this.setUploadServerURL(uploadServerUrl);
-        this.setUploadServerPassword(uploadServerPassword);
-        this.setUploadServerUsername(uploadServerUsername);
-        this.setWordpressUsername(wordpressUsername);
-        this.setUploadServerWorkingDir(uploadServerWorkingDir);
-        this.setUploadProtocol(uploadProtocol);
-        this.setWordpressXmlrpcUrl(wordpressURL);
-        this.setBitrate(mp3_bitrate);
-        this.setId3_title(id3_title);
-        this.setId3_artist(id3_artist);
-        this.setId3_year(id3_year);
-        this.setId3_comment(id3_comment);
-        this.setId3_genre(id3_genre);
-        this.setWpRemember(wpRemember);
-        this.setServerRemember(serverRemember);
+    public void setDecodeProperty(String decodeProperty){
+        this.decodeProperty = decodeProperty;
+        setConfigEntry("id3_decodeProperty", decodeProperty);
     }
 
+    /**
+     * Set Upload Status
+     *
+     * @param uploadStatus
+     */
+    public void setUploadStatus(String uploadStatus){
+        this.uploadStatus = uploadStatus;
+        setConfigEntry("uploadStatus", uploadStatus);
+    }
+
+    /**
+     * Set if the User is Logging Out or is starting the Program
+     *
+     * @param wpReLoggingIn
+     */
+    public void setWpReLoggingIn(Boolean wpReLoggingIn){
+        this.wpReLoggingIn = wpReLoggingIn;
+        setConfigEntry("wpReLoggingIn", Boolean.toString(wpReLoggingIn));
+    }
+
+    /**
+     * Set if the User is Logging Out or is starting the Program
+     *
+     * @param serverReLoggingIn
+     */
+    public void setServerReLoggingIn(Boolean serverReLoggingIn){
+        this.serverReLoggingIn = serverReLoggingIn;
+        setConfigEntry("serverReLoggingIn", Boolean.toString(serverReLoggingIn));
+    }
+
+
+    /**
+     * Deletes the config for the Server Login
+     */
     public void deleteServerConfig() {
-        setUploadServerPort(Integer.parseInt(null));
-        setUploadServerWorkingDir(null);
-        setUploadServerPassword(null);
-        setUploadServerURL(null);
-        setUploadProtocol(null);
-        setUploadServerUsername(null);
+        setUploadServerPort(0);
+        setUploadServerWorkingDir(" ");
+        setUploadServerPassword(" ");
+        setUploadServerURL(" ");
+        setUploadProtocol(Protocols.FTPS);
+        setUploadServerUsername(" ");
     }
 
+    /**
+     * Delets the config for the WordPress Login
+     */
     public void deleteWorPressConfig(){
-        setWordpressPassword(null);
-        setWordpressUsername(null);
-        setWordpressXmlrpcUrl(null);
-        setRemoteServerPath(null);
+        setWordpressPassword(" ");
+        setWordpressUsername(" ");
+        setWordpressXmlrpcUrl(" ");
+        setRemoteServerPath(" ");
     }
 }

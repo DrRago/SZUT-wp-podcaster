@@ -35,9 +35,16 @@ public class mediaViewSettings {
 
     public MediaPlayer player;
 
+    /**
+     * Buttons for the MediaPlayer
+     */
     public void initialize(){
     }
 
+    /**
+     * Pause Button
+     * @param event
+     */
     @FXML
     void btnPause(ActionEvent event) {
         transparentBtn();
@@ -47,6 +54,10 @@ public class mediaViewSettings {
         btnPlay.setStyle("-fx-background-color: transparent");
     }
 
+    /**
+     * Play Button
+     * @param event
+     */
     @FXML
     void btnPlay(ActionEvent event) {
         transparentBtn();
@@ -60,6 +71,10 @@ public class mediaViewSettings {
         }
     }
 
+    /**
+     * Stop Button
+     * @param event
+     */
     @FXML
     void btnStop(ActionEvent event) {
         transparentBtn();
@@ -69,6 +84,9 @@ public class mediaViewSettings {
         btnPause.setStyle("-fx-background-color: transparent");
     }
 
+    /**
+     * If loading a new File
+     */
     private void transparentBtn() {
         btnStop.setStyle("-fx-background-color: transparent");
         btnPlay.setStyle("-fx-background-color: transparent");

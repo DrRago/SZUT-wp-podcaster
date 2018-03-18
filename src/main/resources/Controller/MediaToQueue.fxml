@@ -12,6 +12,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.controller.MediaToQueue">
    <children>
       <HBox maxWidth="1.7976931348623157E308">
@@ -178,7 +180,7 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308">
          <children>
-            <Button fx:id="acceptBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#acceptBtn" text="Decode &amp; Upload" HBox.hgrow="ALWAYS">
+            <Button fx:id="acceptBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#acceptBtn" text="Add to Queue" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>

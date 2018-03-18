@@ -6,15 +6,12 @@ import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.MyPost;
 import config.Config;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -36,10 +33,7 @@ import java.util.List;
 public class MainController {
 
     @Setter
-    private ServerLoginController serverLoginController;
-
-    @Setter
-    private WpLoginController wpLoginController;
+    private WpLoginController controller;
 
     @FXML
     public TableView<MyPost> tableView;
@@ -57,9 +51,6 @@ public class MainController {
     public HBox mainHbox;
 
     @FXML
-    public ProgressBar statusbar;
-
-    @FXML
     public static Button btnAddNew;
 
     @FXML
@@ -72,7 +63,7 @@ public class MainController {
     TableColumn<MyPost, String> authorColumn;
 
     private Region pane;
-    private Blog blog;
+    private Blog blog = null;
 
     private Config config;
 
@@ -81,34 +72,28 @@ public class MainController {
     public static Stage stageSettings = new Stage();
     private Stage stageHelp = new Stage();
 
-    public static Uploader uploader;
-
-    private ObservableList tableData = FXCollections.observableArrayList();
-    private static Stage stageLogin = new Stage();
+    public static Uploader uploader = null;
 
 
     /**
      * Initialize the main window
-     * Set a status bar for progress on upload
+     *
      * Load default images
      */
     public void initialize() throws Exception {
-        loadPane();
         config = new Config();
+
+        uploader = UploaderFactory.getUploader(config.getUploadProtocol(),config.getUploadServerUrl(),config.getUploadServerPort(),config.getUploadServerUsername(),config.getUploadServerPassword(),config.getUploadServerWorkingDir());
+        blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), uploader,config.getRemoteServerPath());
+
+        loadPane();
+
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("postID"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("postTitle"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("postAuthor"));
 
-        statusbar.setProgress(0.0);
-/*        try {
-            loadPane();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        statusTypeLabel.setVisible(false);
-        statusbar.setVisible(false);
+        statusTypeLabel.setVisible(true);
 
         stagePodcast.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
         stageHelp.getIcons().add(new Image("icons/WP-Podcaster-Icon.png"));
@@ -121,42 +106,23 @@ public class MainController {
             }
         });
 
-        uploader.isConnected();
-
-        uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
-        blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), uploader, config.getRemoteServerPath());
-
         refreshTableView();
+
     }
 
+    /**
+     * refresh the tableView
+     *
+     * @throws ObjectNotFoundException
+     * @throws XmlRpcFault
+     * @throws InsufficientRightsException
+     */
     @FXML
     private void refreshTableView() throws ObjectNotFoundException, XmlRpcFault, InsufficientRightsException {
         tableView.getItems().clear();
         List<MyPost> recentUploadedPosts = blog.getPosts();
 
         tableView.getItems().addAll(recentUploadedPosts);
-    }
-
-    public void openLogin() {
-        FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/WpLogin.fxml"));
-        Parent root = null;
-        try {
-            root = fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        stageLogin.setTitle("Login");
-        stageLogin.setScene(new Scene(root));
-        shutdown();
-        stageLogin.show();
-    }
-
-    public static void shutdown() {
-        try {
-            uploader.disconnect();
-        } catch (UploaderException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -233,12 +199,19 @@ public class MainController {
         }
     }
 
+    /**
+     * Loads a new FXML for new Login
+     */
     @FXML
     void logoutBtn(ActionEvent event){
+        config.setWpReLoggingIn(false);
             closeMainWindow();
             new LoadFxml("Controller/WpLogin.fxml","Login to WordPress", new Stage());
     }
 
+    /**
+     * Loads a new FXML for new Login
+     */
     @FXML
     void changeUploadBtn(ActionEvent event){
         try {
@@ -246,21 +219,29 @@ public class MainController {
         } catch (UploaderException e) {
             e.printStackTrace();
         }
+        config.setServerReLoggingIn(false);
         closeMainWindow();
         new LoadFxml("Controller/ServerLogin.fxml","Change Server", new Stage());
     }
 
+    /**
+     * Closes the MainWindow
+     */
     void closeMainWindow(){
         Stage stage = (Stage)tableView.getScene().getWindow();
         stage.close();
     }
 
+    /**
+     * Button for refreshing the TableView
+     * @param event
+     * @throws XmlRpcFault
+     * @throws ObjectNotFoundException
+     * @throws InsufficientRightsException
+     */
     @FXML
-    public void refreshTableView(ActionEvent event) {
-    }
-
-    public void updatePosts(List<MyPost> posts) {
-        tableView.setItems((ObservableList) posts);
+    public void refreshTableView(ActionEvent event) throws XmlRpcFault, ObjectNotFoundException, InsufficientRightsException {
+        refreshTableView();
     }
 
     /**
@@ -287,7 +268,6 @@ public class MainController {
         VBoxEdt.setMargin(mainHbox, new Insets(5, 5, 0, 0));
         VBoxEdt.getChildren().add(pane);
         pane.setVisible(true);
-        statusbar.setProgress(0.5);
     }
 
     /**
@@ -300,20 +280,6 @@ public class MainController {
         if (pane != null) {
             pane.setVisible(false);
         }
-    }
-
-    /**
-     * Close the podcast window
-     */
-    public void closePodcast() {
-        stagePodcast.close();
-    }
-
-    /**
-     * Close the settings window
-     */
-    public void closeOption() {
-        stageSettings.close();
     }
 }
 

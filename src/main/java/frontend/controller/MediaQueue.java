@@ -6,15 +6,18 @@ import backend.MediaFactory.EncodingException;
 import backend.MediaFactory.Lame;
 import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
-import com.sun.xml.internal.org.jvnet.fastinfoset.EncodingAlgorithmException;
 import config.Config;
-import frontend.LoadingScreen;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,9 +36,12 @@ import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class MediaQueue {
+
+    @Getter
+    @Setter
+    private mediaViewSettings mediaViewSettings;
 
     @Setter
     private MainController controller;
@@ -94,33 +100,48 @@ public class MediaQueue {
     @FXML
     protected ChoiceBox<String> uploadChoiceBox;
 
-    @Getter
-    @Setter
-    private mediaViewSettings mediaViewSettings;
+    private Service<Void> backgroundStartQueueThread;       //New service for Uploading Posts
 
     protected final ToggleGroup group = new ToggleGroup();
     public ObservableList<Lame> postList = FXCollections.observableArrayList();
 
     Config config;
-    private int message;
 
-    public void initialize() {
+    /**
+     * Loads the MediaQueue Pane
+     * @throws IOException
+     */
+    public void initialize() throws IOException {
+        config=new Config();
+
+        //ListView Lame to PostTitle Name
         postListView.setCellFactory(lv -> {
             TextFieldListCell<Lame> cell = new TextFieldListCell<>();
             cell.setConverter(new StringConverter<Lame>() {
                 @Override
                 public String toString(Lame object) {
-                    return object.getID3_Title();
+                    return object.getWp_postTitle();
                 }
 
                 @Override
                 public Lame fromString(String string) {
                     Lame lame = cell.getItem();
-                    lame.setID3_Title(string);
+                    lame.setWp_postTitle(string);
                     return null;
                 }
             });
             return cell;
+        });
+
+        //Set the PotTextField to a numeric TextField
+        yearTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    yearTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
         });
 
         ObservableList<String> options =
@@ -158,11 +179,34 @@ public class MediaQueue {
         });
     }
 
-    /*
-     * Loads new Scene
+    /**
+     * Loads new Scene and saves the Default args
+     * @param event
      */
     @FXML
     void addNewPostBtn(ActionEvent event) {
+        if(albumCheckBox.isSelected()||defaultCheckBox.isSelected())config.setId3_album(albumTextField.getText());
+        else config.setId3_album(" ");
+        if(authorCheckBox.isSelected()||defaultCheckBox.isSelected()){
+            config.setId3_artist(authorTextField.getText());
+            System.out.println("Hat einen Author");
+        }
+        else config.setId3_artist(" ");
+        if(genreCheckBox.isSelected()||defaultCheckBox.isSelected())config.setId3_genre(genreTextField.getText());
+        else config.setId3_genre(" ");
+        if(bitrateCheckbox.isSelected()||defaultCheckBox.isSelected())config.setBitrate((int) bitrateSlider.getValue());
+        else config.setBitrate(320);    //Default Value
+        if(yearCheckBox.isSelected()||defaultCheckBox.isSelected())config.setId3_year(yearTextField.getText());
+        else config.setId3_year(" ");
+        if(decodeCheckBox.isSelected()||defaultCheckBox.isSelected()){
+            if(monoRadioBtn.isSelected())config.setDecodeProperty("mono");
+            else config.setDecodeProperty("stereo");
+        }
+        else config.setDecodeProperty("stereo");
+        if(uploadCheckBox.isSelected()||defaultCheckBox.isSelected())config.setUploadStatus(uploadChoiceBox.getValue());
+        else config.setUploadStatus("publish");
+
+
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/MediaToQueue.fxml"));
         Parent root = null;
         Stage stage = new Stage();
@@ -179,55 +223,58 @@ public class MediaQueue {
         stage.show();
     }
 
+    /**
+     * Closes the Pane
+     * @param event
+     */
     @FXML
     void closeBtn(ActionEvent event) {
-        //TODO: CLOSE PANE
         // get a handle to the stage
         controller.closePane();
     }
 
+    /**
+     * Starts the service and Uploads the Post to the Server
+     * @param event
+     * @throws Exception
+     */
     @FXML
     void uploadPostsBtn(ActionEvent event) throws Exception {
-
-        //closeBtn(event);
-
-        //TODO: Close Process for the Media
-        config = new Config();
         LameQueue lameQueue = new LameQueue(new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), controller.uploader, config.getRemoteServerPath()));
         for (int i = 0; i < postList.size(); i++) {
             lameQueue.add(postList.get(i));
             postList.remove(i);
         }
-        writeToActivityLog(lameQueue);
 
-    }
+        controller.closePane();
 
-    public void writeToActivityLog(LameQueue lameQueue){
-
-        class ThreadedTask implements Runnable {
-
-            private final LameQueue lameQueue;
-
-            public ThreadedTask(LameQueue lameQueue) {
-                this.lameQueue = lameQueue;
-            }
+        backgroundStartQueueThread = new Service<Void>() {
 
             @Override
-            public void run() {
-                try{
-                    lameQueue.startQueue();
-                } catch(NullPointerException|IOException|ObjectNotFoundException|XmlRpcException|InvalidArgumentsException|InsufficientRightsException|UploaderException|XmlRpcFault|EncodingException e) {
-                    e.printStackTrace();
-                }
+            protected Task<Void> createTask() {
+
+                return new Task<Void>() {
+
+                    @Override
+                    protected Void call() {
+                        try {
+                            lameQueue.startQueue();
+                        } catch (Exception e) {
+                            new ShowAlert(Alert.AlertType.ERROR,"Permission Denied. Check Configuration and then try again.","Permission Denied");
+                        }
+                        return null;
+                    }
+                };
             }
-        }
+        };
 
-        ThreadedTask thread = new ThreadedTask(lameQueue);
-        Platform.runLater(thread);
-
+        backgroundStartQueueThread.restart();
     }
 
-
+    /**
+     * Album CheckBox
+     * @param event
+     */
     @FXML
     void albumCheckBox(ActionEvent event) {
         if (!albumCheckBox.isSelected()) {
@@ -238,6 +285,10 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Upload CheckBox
+     * @param event
+     */
     @FXML
     void uploadCheckBox(ActionEvent event) {
         if (!uploadCheckBox.isSelected()) {
@@ -248,6 +299,10 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Author CheckBox
+     * @param event
+     */
     @FXML
     void authorCheckBox(ActionEvent event) {
         if (authorCheckBox.isSelected()) {
@@ -258,6 +313,10 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Bitrate CheckBox
+     * @param event
+     */
     @FXML
     void bitrateCheckbox(ActionEvent event) {
         if (bitrateCheckbox.isSelected()) {
@@ -268,6 +327,10 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Decode CheckBox
+     * @param event
+     */
     @FXML
     void decodeCheckBox(ActionEvent event) {
         if (decodeCheckBox.isSelected()) {
@@ -280,6 +343,11 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Genre CheckBox
+     *
+     * @param event
+     */
     @FXML
     void genreCheckBox(ActionEvent event) {
         if (genreCheckBox.isSelected()) {
@@ -290,6 +358,11 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Year CheckBox
+     *
+     * @param event
+     */
     @FXML
     void yearCheckBox(ActionEvent event) {
         if (yearCheckBox.isSelected()) {
@@ -300,6 +373,10 @@ public class MediaQueue {
         changeDefaultCheckBox();
     }
 
+    /**
+     * Default ChechBox to Select or Deselect every CheckBox
+     * @param event
+     */
     @FXML
     void defaultCheckBox(ActionEvent event) {
         if (defaultCheckBox.isSelected()) {
@@ -309,6 +386,10 @@ public class MediaQueue {
         }
     }
 
+    /**
+     * Disable
+     * @param b
+     */
     private void changeDisabled(Boolean b) {
         authorTextField.setDisable(b);
         albumTextField.setDisable(b);
@@ -327,6 +408,9 @@ public class MediaQueue {
         uploadCheckBox.selectedProperty().setValue(!b);
     }
 
+    /**
+     * Check if every Box is checked or not
+     */
     private void changeDefaultCheckBox() {
         if (!authorCheckBox.selectedProperty().getValue() || !albumCheckBox.selectedProperty().getValue() ||
                 !yearCheckBox.selectedProperty().getValue() || !genreCheckBox.selectedProperty().getValue() ||

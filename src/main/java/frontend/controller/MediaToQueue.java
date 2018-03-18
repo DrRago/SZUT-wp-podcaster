@@ -2,6 +2,7 @@ package frontend.controller;
 
 import backend.MediaFactory.AudioMode;
 import backend.MediaFactory.Lame;
+import config.Config;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -32,20 +33,14 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class MediaToQueue {
 
-    @Setter
-    @Getter
-    private MediaQueue controller;
-
-    @Setter
-    @Getter
-    private mediaViewSettings mediaViewSettings;
-
-    @FXML
-    private TextField titleTextField;
-
+    // New Toggle Group for Buttons
+    private final ToggleGroup group = new ToggleGroup();
+    public Media media;
+    public MediaPlayer player = null;
     @FXML
     protected RadioButton monoRadioBtn;
 
@@ -69,51 +64,47 @@ public class MediaToQueue {
 
     @FXML
     protected TextField genreTextField;
-
-    @FXML
-    private TextArea commentTextArea;
-
-    @FXML
-    private Button acceptBtn;
-
-    @FXML
-    private Button cancelBtn;
-
-    @FXML
-    private AnchorPane anchorPane;
-
-    @FXML
-    private HBox playerHbox;
-
     @FXML
     Button selectMediaBtn;
-
     @FXML
     Slider slider;
-
     @FXML
     VBox mediaVBox;
-
     @FXML
     Label bitRateLabel;
-
     @FXML
     TextField wpTitleTextField;
-
+    @Setter
+    @Getter
+    private MediaQueue controller;
+    @Setter
+    @Getter
+    private mediaViewSettings mediaViewSettings;
+    @FXML
+    private TextField titleTextField;
+    @FXML
+    private TextArea commentTextArea;
+    @FXML
+    private Button acceptBtn;
+    @FXML
+    private Button cancelBtn;
+    @FXML
+    private AnchorPane anchorPane;
+    @FXML
+    private HBox playerHbox;
     private Pane pane;
-
-    public Media media;
-
-    public MediaPlayer player = null;
-
-    private final ToggleGroup group = new ToggleGroup();
-
     private MediaView mediaView;
 
     private Lame lame = null;
     private File file;
+    private Config config;
 
-    public void initialize() {
+
+    /*
+     * After opening the FXML
+     */
+    public void initialize() throws IOException {
+        config = new Config();
         // Add a listener to change the label after a value change
         bitRateSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
             bitRateLabel.setText(Double.toString(Math.round(bitRateSlider.getValue())) + " kBit/s");
@@ -138,8 +129,35 @@ public class MediaToQueue {
         //Default is Publish
         uploadConfig.getSelectionModel().select(3);
 
+        //Set the PotTextField to a numeric TextField
+        yearTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    yearTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+
+
+        //Check if default Arguments are set and show them in the TextFields
+        authorTextField.setText(config.getId3_artist());
+        albumTextField.setText(config.getId3_album());
+        yearTextField.setText(config.getId3_year());
+        genreTextField.setText(config.getId3_genre());
+        bitRateSlider.setValue(config.getMp3_bitrate());
+        if (Objects.equals(config.getDecodeProperty(), "mono")) monoRadioBtn.setSelected(true);
+        else if (Objects.equals(config.getDecodeProperty(), "stereo")) stereoRadioBtn.setSelected(true);
+        uploadConfig.setValue(config.getUploadStatus());
+
     }
 
+    /**
+     * Loads the Post to PostQueue
+     * @param event
+     * @throws IOException
+     */
     @FXML
     void acceptBtn(ActionEvent event) throws IOException {
         //Set the ID3 Tags to the Lame Object
@@ -155,34 +173,36 @@ public class MediaToQueue {
 
         AudioMode audioMode = null;
         Toggle currentToggle = group.getSelectedToggle();
-        if(audioMode==null) {
-            if (currentToggle == monoRadioBtn) {
-                audioMode = AudioMode.MONO;
+        if (audioMode == null) {
+            if (currentToggle == monoRadioBtn) audioMode = AudioMode.MONO;
+            else if (currentToggle == stereoRadioBtn) audioMode = AudioMode.JOINT;
+        }
 
-            } else if (currentToggle == stereoRadioBtn) {
-                audioMode = AudioMode.JOINT;
+        ObservableList<String> errormsg = FXCollections.observableArrayList();
+        if(wpTitleTextField.getText().isEmpty())errormsg.add("Blog title");
+        if(group.getSelectedToggle() == null){
+            if(errormsg.isEmpty())errormsg.add("Decode");
+            else errormsg.add("/ Decode");
+        }
+        errormsg.toString().replace("[","").replace("]","");
+        if (group.getSelectedToggle() == null||wpTitleTextField.getText().isEmpty()) {
+            new ShowAlert("No"+errormsg+" type detected!", "No"+errormsg+" detected");
+        } else {
+            lame.setAudioMode(audioMode);
+            if (lame != null) {
+                controller.postList.add(lame);
+                cancelBtn(event);
             }
         }
-        if (group.getSelectedToggle()==null){
-            new ShowAlert("No decode type detected\nPlease select a decode Type!","No decode type detected");
-        }
-        else{
-            lame.setAudioMode(audioMode);
-        }
 
-        if(lame!=null) {
-            controller.postList.add(lame);
-
-            System.out.println("Drin");
-            cancelBtn(event);
-        }
-        else {
-            System.out.println("Fehler");
-        }
         player.stop();
         player.dispose();
     }
 
+    /**
+     * Cancel the Post
+     * @param event
+     */
     @FXML
     void cancelBtn(ActionEvent event) {
         // get a handle to the stage
@@ -190,56 +210,28 @@ public class MediaToQueue {
         stage.close();
     }
 
+    /**
+     * Selects the Media
+     * @param event
+     * @throws IOException
+     * @throws TagException
+     */
     @FXML
     void selectMediaBtn(ActionEvent event) throws IOException, TagException {
-        if(player != null)player.stop();
-
-        //Check if default Arguments are set and show them in the TextFields
-        if(controller.authorCheckBox.selectedProperty().getValue()){
-            authorTextField.setText(controller.authorTextField.getText());
-        }
-        if(controller.albumCheckBox.isSelected()){
-            albumTextField.setText(controller.albumTextField.getText());
-        }
-        if(controller.yearCheckBox.isSelected()){
-            yearTextField.setText(controller.yearTextField.getText());
-        }
-        if(controller.genreCheckBox.isSelected()){
-            genreTextField.setText(controller.genreTextField.getText());
-        }
-        if(controller.bitrateCheckbox.isSelected()){
-            bitRateSlider.setValue(controller.bitrateSlider.getValue());
-        }
-        if(controller.decodeCheckBox.isSelected()){
-            if(controller.monoRadioBtn.isSelected()){
-                monoRadioBtn.setSelected(true);
-            }
-            else{
-                stereoRadioBtn.setSelected(true);
-            }
-        }
-        if(controller.uploadCheckBox.isSelected()){
-            uploadConfig.setSelectionModel(controller.uploadChoiceBox.getSelectionModel());
-        }
+        if (player != null) player.stop();
 
         //Close pane, if already a file was Selected
         closeButtonPane();
 
         //Load a new File
-        if(file!=null){
-            //TODO: TWO FILES LOADING ERROR?
-        }
-
         file = getFile();
-
         if (file != null) {
-
-            //TODO: remove already existing data in list
+            //Create a temp media
             Path tmpFile = Files.createTempFile(file.getName(), ".mediaplayer.tmp");
 
-            copyFileConetents(file, tmpFile.toFile());
+            copyFileContents(file, tmpFile.toFile());
 
-            if(!tmpFile.toFile().exists()) {
+            if (!tmpFile.toFile().exists()) {
                 Files.copy(file.toPath(), tmpFile);
             }
             //Create new Lame Object
@@ -267,7 +259,7 @@ public class MediaToQueue {
             anchorPane.getChildren().add(pane);
             double currentWidth = mediaVBox.getWidth();
             anchorPane.setMinWidth(110);                //Width of Buttons
-            mediaVBox.setMaxWidth(currentWidth-anchorPane.getWidth());    //Minus width of Buttons
+            mediaVBox.setMaxWidth(currentWidth - anchorPane.getWidth());    //Minus width of Buttons
 
             mediaVBox.getChildren().addAll(mediaView);
 
@@ -284,8 +276,6 @@ public class MediaToQueue {
                     slider.setVisible(true);
 
                     playerHbox.setVisible(true);
-
-                    //TODO: WHILE LOADING FILE SHOW LOADING SCREEN...
                 }
             });
 
@@ -309,7 +299,13 @@ public class MediaToQueue {
 
     }
 
-    private void copyFileConetents(File source, File destination) throws IOException {
+    /**
+     * Copy File Contents
+     * @param source
+     * @param destination
+     * @throws IOException
+     */
+    private void copyFileContents(File source, File destination) throws IOException {
         FileChannel srcChannel = new FileInputStream(source).getChannel();
 
         // Create channel on the destination

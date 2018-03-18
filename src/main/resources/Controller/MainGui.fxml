@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.controller.MainController">
+<VBox prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.controller.MainController">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -162,9 +162,8 @@
         <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
             <children>
                 <Label fx:id="statusTypeLabel" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Uploading" HBox.hgrow="ALWAYS" />
-                <ProgressBar fx:id="statusbar" prefWidth="200.0" progress="0.0" />
                 <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-                <Label maxWidth="-1.0" text="Right status" HBox.hgrow="NEVER" />
+                <Label maxWidth="-1.0" text="" HBox.hgrow="NEVER" />
             </children>
             <padding>
                 <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />

@@ -9,6 +9,13 @@ import util.PathUtil;
 import java.io.IOException;
 
 public class LoadFxml {
+
+    /**
+     *
+     * @param path
+     * @param title
+     * @param stage
+     */
     public LoadFxml(String path, String title, Stage stage){
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath(path));
         Parent root = null;

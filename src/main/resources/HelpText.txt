@@ -3,23 +3,19 @@ This WordPress Podcaster is designed to have a easier way publishing new Podcast
 
 How it works:
 
-
-If your starting the program the first time you have to link your WordPress-Website and login to it.
-
-If you have already done this:
-- Create a new Podcast
+If you want to create a new post:
+- Click on 'Add new Posts'
+- There you can set default values for all your upcoming posts
+- To add a post you have to click on 'Add post to queue'
+- Then you can give your post a title
 - Choose your File, which you're going to upload
-- Give it a title
-- Click Save and Publish it to your Website
-
-Editing:
-You can edit a Podcast by choosing your Podcast in the Table
-- Choose your Podcast
-- Click Edit
-- After your changes click Save
+- Click 'Add to queue' and then 'Upload posts' to submit your posts to your WordPress server
 
 Removing:
 If you don't want to have a Podcast on your Website anymore just delete it
 - Choose the Podcast
 - Click Remove
 - Verify it by clicking on Ok
+
+If you want to change your Upload server, simply click 'Change Upload Server'.
+To change your WordPress server, click on 'Logout from WordPress'.

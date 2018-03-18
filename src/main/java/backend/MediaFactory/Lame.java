@@ -1,6 +1,5 @@
 package backend.MediaFactory;
 
-import com.sun.xml.internal.org.jvnet.fastinfoset.EncodingAlgorithmException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +61,6 @@ public class Lame {
             throw new FileNotFoundException(String.format("MP3 \"%s\" could not be found", file));
         }
         ID3TagUtil = new ID3TagUtil(file);
-        // TODO: 17/03/2018 change bitrate
         bitrate = ID3TagUtil.getBitrate();
         wp_postTitle = ID3TagUtil.getID3_Title();
         checkCommand();
@@ -101,9 +99,9 @@ public class Lame {
      * start the encoding of the mp3 file. This method uses the lame encoder, that also sets id3 tags by itself.
      *
      * @throws IOException                the io exception
-     * @throws EncodingAlgorithmException the encoding algorithm exception
+     * @throws EncodingException the encoding algorithm exception
      */
-    public void executeCommand() throws IOException, EncodingAlgorithmException {
+    public void executeCommand() throws IOException, EncodingException {
         Path source = ID3TagUtil.getFile().toPath();
         // create a temporary file the encoded mp3 should be stored in the meantime
         Path tmp = Files.createTempFile(ID3TagUtil.getFile().getName(), ".tmp");
@@ -148,7 +146,7 @@ public class Lame {
             // encoding failed if lame doesn't return something
             if (!builder.toString().trim().equals("")) {
                 LOGGER.severe("encoding failed");
-                throw new EncodingAlgorithmException(builder.toString());
+                throw new EncodingException(builder.toString());
             }
             LOGGER.info(String.format("backing up %s", source));
             // saving a backup of the original file with a new name

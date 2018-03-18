@@ -1,9 +1,9 @@
 package backend.LameQueue;
 
+import backend.MediaFactory.EncodingException;
 import backend.MediaFactory.Lame;
 import backend.fileTransfer.UploaderException;
 import backend.wordpress.Blog;
-import com.sun.xml.internal.org.jvnet.fastinfoset.EncodingAlgorithmException;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
 import net.bican.wordpress.exceptions.InvalidArgumentsException;
 import net.bican.wordpress.exceptions.ObjectNotFoundException;
@@ -33,14 +33,14 @@ public class LameQueue extends ArrayList<Lame> {
      * It iterates over every Lame object in itself, starts the encoding and adds a new post to the blog.
      *
      * @throws IOException                 the io exception
-     * @throws EncodingAlgorithmException  the encoding algorithm exception
+     * @throws EncodingException  the encoding algorithm exception
      * @throws InsufficientRightsException the insufficient rights exception
      * @throws InvalidArgumentsException   the invalid arguments exception
      * @throws XmlRpcFault                 the xml rpc fault
      * @throws ObjectNotFoundException     the object not found exception
      * @throws UploaderException           the uploader exception
      */
-    public void startQueue() throws IOException, EncodingAlgorithmException, InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException {
+    public void startQueue() throws IOException, EncodingException, InsufficientRightsException, InvalidArgumentsException, XmlRpcFault, ObjectNotFoundException, UploaderException {
         for (Lame item : this) {
             item.executeCommand();
             blog.addPost(item);

@@ -25,6 +25,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Setter;
+import net.bican.wordpress.exceptions.InsufficientRightsException;
+import net.bican.wordpress.exceptions.ObjectNotFoundException;
+import redstone.xmlrpc.XmlRpcFault;
 import util.PathUtil;
 
 import java.io.IOException;
@@ -118,13 +121,20 @@ public class MainController {
         });
 
         uploader = UploaderFactory.getUploader(config.getUploadProtocol(), config.getUploadServerUrl(), config.getUploadServerPort(), config.getUploadServerUsername(), config.getUploadServerPassword(), config.getUploadServerWorkingDir());
-        blog = new Blog(config.getWordpressUsername(),config.getWordpressPassword(),config.getWordpressXmlrpcUrl(), uploader, config.getRemoteServerPath());
+        blog = new Blog(config.getWordpressUsername(), config.getWordpressPassword(), config.getWordpressXmlrpcUrl(), uploader, config.getRemoteServerPath());
+
+        refreshTableView();
+    }
+
+    @FXML
+    private void refreshTableView() throws ObjectNotFoundException, XmlRpcFault, InsufficientRightsException {
+        tableView.getItems().clear();
         List<MyPost> recentUploadedPosts = blog.getPosts();
 
         tableView.getItems().addAll(recentUploadedPosts);
     }
 
-    public void openLogin(){
+    public void openLogin() {
         FXMLLoader fxmlLoader = new FXMLLoader(PathUtil.getResourcePath("Controller/WpLogin.fxml"));
         Parent root = null;
         try {
@@ -148,15 +158,17 @@ public class MainController {
 
     /**
      * Add a new entry through the menubar
+     *
      * @param event
      */
     @FXML
-    void menuNew(ActionEvent event){
+    void menuNew(ActionEvent event) {
         btnAddNew(event);
     }
 
     /**
      * Access the Settings-Window through the menubar
+     *
      * @param event
      */
     @FXML
@@ -166,6 +178,7 @@ public class MainController {
 
     /**
      * Close the program through the menubar
+     *
      * @param event
      */
     @FXML
@@ -175,10 +188,13 @@ public class MainController {
 
     /**
      * Remove an entry through the menubar
+     *
      * @param event
      */
     @FXML
-    void menuRemove(ActionEvent event){btnRemove(event);}
+    void menuRemove(ActionEvent event) throws ObjectNotFoundException, XmlRpcFault, InsufficientRightsException {
+        btnRemove(event);
+    }
 
     /**
      * Access the Edit-Pane through the menubar
@@ -187,15 +203,17 @@ public class MainController {
 
     /**
      * Open a Help-Window
+     *
      * @param event
      */
     @FXML
-    void menuHelp(ActionEvent event){
+    void menuHelp(ActionEvent event) {
         new LoadFxml("Controller/Help.fxml", "Help", new Stage());
     }
 
     /**
      * Open the settings window through the button
+     *
      * @param event
      */
     @FXML
@@ -205,6 +223,7 @@ public class MainController {
 
     /**
      * Add a new entry through the button
+     *
      * @param event
      */
     @FXML
@@ -220,32 +239,30 @@ public class MainController {
         }
         VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
         VBoxEdt.setMaxHeight(mainHbox.getMaxHeight());
-        VBoxEdt.setMargin(mainHbox, new Insets(5,5,0,0));
+        VBoxEdt.setMargin(mainHbox, new Insets(5, 5, 0, 0));
         VBoxEdt.getChildren().add(pane);
         pane.setVisible(true);
     }
 
     /**
      * Remove an entry through the button
+     *
      * @param event
      */
     @FXML
-    void btnRemove(ActionEvent event) {
+    void btnRemove(ActionEvent event) throws InsufficientRightsException, XmlRpcFault, ObjectNotFoundException {
         closePane();
-
-        /* Get selected listings
-        TODO: Do Listing Service
-        final ObservableList<> items = tableView.getSelectionModel().getSelectedItems();
-        for (Aufgelistete : items) {
-
+        int deleteID = tableView.getSelectionModel().getSelectedItem().getPostID();
+        if (blog.deletePost(deleteID)) {
+            new ShowAlert(Alert.AlertType.INFORMATION, String.format("Post %d was successfully moved to bin. You can undo this action by logging in on wordpress", deleteID), "Success", "Deletion successful");
+            tableView.getItems().remove(tableView.getSelectionModel().getFocusedIndex());
+        } else {
+            new ShowAlert(Alert.AlertType.ERROR, String.format("Post %d wasn't successfully moved to bin. The data might be not exist anymore, please reload the table", deleteID), "Error", "Deletion failure");
         }
-        tableData.removeAll(items)
-        */
-
     }
 
     @FXML
-    void logoutBtn(ActionEvent event){
+    void logoutBtn(ActionEvent event) {
         try {
             uploader.disconnect();
         } catch (UploaderException e) {
@@ -253,7 +270,7 @@ public class MainController {
         }
     }
 
-    public void updatePosts(List<MyPost> posts){
+    public void updatePosts(List<MyPost> posts) {
         tableView.setItems((ObservableList) posts);
     }
 
@@ -278,6 +295,7 @@ public class MainController {
 
     /**
      * Main method to open the information part for uploading
+     *
      * @throws IOException
      */
     void loadPane() throws IOException {
@@ -300,7 +318,7 @@ public class MainController {
     void openPane() {
         VBoxEdt.setMaxWidth(mainHbox.getMaxWidth());
         VBoxEdt.setMaxHeight(mainHbox.getMaxHeight());
-        VBoxEdt.setMargin(mainHbox, new Insets(5,5,0,0));
+        VBoxEdt.setMargin(mainHbox, new Insets(5, 5, 0, 0));
         VBoxEdt.getChildren().add(pane);
         pane.setVisible(true);
         statusbar.setProgress(0.5);
@@ -310,10 +328,12 @@ public class MainController {
      * Main method to close the sidepane
      */
     public void closePane() {
-        VBoxEdt.setMargin(mainHbox, new Insets(0,0,0,0));
+        VBoxEdt.setMargin(mainHbox, new Insets(0, 0, 0, 0));
         VBoxEdt.setMaxWidth(0);
         VBoxEdt.getChildren().remove(pane);
-        pane.setVisible(false);
+        if (pane != null) {
+            pane.setVisible(false);
+        }
     }
 
     /**
@@ -326,7 +346,8 @@ public class MainController {
     /**
      * Close the settings window
      */
-    public void closeOption() { stageSettings.close();
+    public void closeOption() {
+        stageSettings.close();
     }
 }
 

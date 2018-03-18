@@ -6,7 +6,6 @@ import backend.fileTransfer.UploaderFactory;
 import backend.wordpress.Blog;
 import backend.wordpress.WordpressConnectionException;
 import config.Config;
-import frontend.LoadingScreen;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,12 +19,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import lombok.Setter;
 import util.PathUtil;
 
 import java.io.IOException;
-import java.util.List;
 
 public class WpLoginController {
 

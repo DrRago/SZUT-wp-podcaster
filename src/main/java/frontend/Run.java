@@ -1,23 +1,14 @@
 package frontend;
 
-import com.sun.javafx.application.LauncherImpl;
-import config.Config;
-import frontend.controller.MainController;
-import frontend.controller.ServerLoginController;
-import frontend.controller.WpLoginController;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import util.PathUtil;
 
 import java.io.IOException;
-
-import static javafx.application.Application.launch;
 
 public class Run extends Application {
 

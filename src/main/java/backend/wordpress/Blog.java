@@ -6,6 +6,7 @@ import backend.fileTransfer.UploaderException;
 import com.google.common.net.UrlEscapers;
 import lombok.Getter;
 import lombok.Setter;
+import net.bican.wordpress.FilterPost;
 import net.bican.wordpress.Post;
 import net.bican.wordpress.Wordpress;
 import net.bican.wordpress.exceptions.InsufficientRightsException;
@@ -72,7 +73,9 @@ public class Blog {
      * @throws ObjectNotFoundException     the object not found exception
      */
     public List<MyPost> getPosts() throws XmlRpcFault, InsufficientRightsException, ObjectNotFoundException {
-        List<Post> postList = wp.getPosts();
+        FilterPost filter = new FilterPost();
+        filter.setNumber(30);
+        List<Post> postList = wp.getPosts(filter);
         List<MyPost> posts = new ArrayList<>();
         for (Post post : postList) {
             posts.add(new MyPost(post.getPost_id(), post.getPost_title(), wp.getUser(post.getPost_author()).getNickname()));
@@ -115,5 +118,19 @@ public class Blog {
         // add the post to wordpress
         Integer result = wp.newPost(recentPost);
         LOGGER.info(String.format("Post created with id %d", result));
+    }
+
+    /**
+     * Move a post to bin on wordpress
+     *
+     * @param postID the post id of the post to be deleted
+     * @return the boolean if the post was successfully deleted
+     * @throws XmlRpcFault                 the xml rpc fault
+     * @throws ObjectNotFoundException     the object not found exception
+     * @throws InsufficientRightsException the insufficient rights exception
+     */
+    public boolean deletePost(final int postID) throws XmlRpcFault, ObjectNotFoundException, InsufficientRightsException {
+        LOGGER.info(String.format("moving post %d to bin", postID));
+        return wp.deletePost(postID);
     }
 }

@@ -317,4 +317,20 @@ public class Config {
         this.setWpRemember(wpRemember);
         this.setServerRemember(serverRemember);
     }
+
+    public void deleteServerConfig() {
+        setUploadServerPort(Integer.parseInt(null));
+        setUploadServerWorkingDir(null);
+        setUploadServerPassword(null);
+        setUploadServerURL(null);
+        setUploadProtocol(null);
+        setUploadServerUsername(null);
+    }
+
+    public void deleteWorPressConfig(){
+        setWordpressPassword(null);
+        setWordpressUsername(null);
+        setWordpressXmlrpcUrl(null);
+        setRemoteServerPath(null);
+    }
 }
